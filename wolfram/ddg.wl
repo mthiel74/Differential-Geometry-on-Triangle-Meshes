@@ -25,6 +25,7 @@ meanCurvatureNormal::usage = "meanCurvatureNormal[mr] returns the per-vertex mea
 meanCurvature::usage     = "meanCurvature[mr] returns the signed per-vertex mean curvature (mean-curvature normal projected on the unit vertex normal).";
 massMatrix::usage        = "massMatrix[mr] returns the diagonal (lumped) mass matrix of barycentric vertex areas.";
 implicitFairing::usage   = "implicitFairing[coords, tris, tau, n] runs n steps of semi-implicit mean-curvature flow (Desbrun et al. 1999): (M - tau L) x' = M x. Returns the list of coordinate frames (length n+1).";
+laplacianSpectrum::usage = "laplacianSpectrum[mr, k] returns {values, vectors} for the k smallest eigenpairs of the generalized problem (-L) phi = lambda M phi (Laplace-Beltrami). Eigenvectors are rows, M-orthonormal. Dense solver: use for meshes up to ~1000 vertices.";
 
 Begin["`Private`"];
 
@@ -164,6 +165,22 @@ implicitFairing[coords0_, tris_, tau_, n_Integer] :=
      AppendTo[frames, x],
      {n}];
    frames];
+
+(* Generalized eigenproblem (-L) phi = lambda M phi. With M diagonal lumped,
+   symmetrize via S = M^-1/2 (-L) M^-1/2 (PSD), solve dense, map back. The
+   eigenvectors are M-orthonormal because a_i (1/sqrt a_i)^2 = 1.            *)
+laplacianSpectrum[mr_MeshRegion, k_Integer] := Module[
+   {a, isq, lpos, s, vals, vecs, ord, dm},
+   a = vertexAreasBary[mr];
+   isq = 1./Sqrt[a];
+   lpos = -cotanLaplacian[mr];
+   dm = SparseArray[Band[{1, 1}] -> isq];
+   s = dm . lpos . dm;                        (* symmetric PSD *)
+   {vals, vecs} = Eigensystem[Symmetrize[N[Normal[s]]]];
+   ord = Ordering[vals, k];                   (* k smallest *)
+   vals = Clip[vals[[ord]], {0., Infinity}];   (* tiny negatives -> 0 *)
+   vecs = (isq # &) /@ vecs[[ord]];            (* map psi -> phi = M^-1/2 psi *)
+   {vals, vecs}];
 
 gaussBonnetCheck[mr_MeshRegion] := Module[{defect, chi, twoPiChi},
   defect = Total[angleDefect[mr]];

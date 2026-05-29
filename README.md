@@ -51,19 +51,30 @@ The whole pipeline is **pure Wolfram Language**.
 ## Reproducing
 
 ```sh
-# Angle-defect Gaussian curvature on a torus + Gauss–Bonnet check
+# §1 Angle-defect Gaussian curvature on a torus + Gauss–Bonnet check
 wolframscript -file wolfram/curvature.wls
 
-# Cotangent Laplace–Beltrami operator + mean curvature (sphere H=1, torus H(u))
+# §2 Cotangent Laplace–Beltrami operator + mean curvature (sphere H=1, torus H(u))
 wolframscript -file wolfram/meancurvature.wls
 
-# Sanity checks
-wolframscript -file tests/test_gauss_bonnet.wls
-wolframscript -file tests/test_mean_curvature.wls
+# §3 Spectral geometry: LBO eigenfunctions, sphere spectrum l(l+1), smoothing
+wolframscript -file wolfram/spectral.wls
+
+# §4 Mean-curvature flow (semi-implicit fairing) + shrinking-sphere rate
+wolframscript -file wolfram/meanflow.wls
+
+# Sanity checks (all exit 0)
+for t in tests/test_*.wls; do wolframscript -file "$t"; done
+
+# Build the Wolfram Community notebook (community/ddg.nb + .pdf)
+wolframscript -file community/build_notebook.wls
 ```
 
-Both figures land in `docs/images/`. More entry points will be added as
-the exploration grows.
+Figures land in `docs/images/`. The narrative arc — following the
+"one matrix (the cotangent Laplacian) does everything" thread — is:
+**curvature → Laplace–Beltrami → spectrum → curvature flow →
+heat-method geodesics → (DEC / Hodge)**. The first four are implemented;
+the heat method and DEC are next.
 
 ### A note on test meshes
 
