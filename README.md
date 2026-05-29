@@ -51,11 +51,30 @@ The whole pipeline is **pure Wolfram Language**.
 ## Reproducing
 
 ```sh
-# Discrete curvature on a torus + Gauss–Bonnet check, writes docs/images/
+# Angle-defect Gaussian curvature on a torus + Gauss–Bonnet check
 wolframscript -file wolfram/curvature.wls
+
+# Cotangent Laplace–Beltrami operator + mean curvature (sphere H=1, torus H(u))
+wolframscript -file wolfram/meancurvature.wls
+
+# Sanity checks
+wolframscript -file tests/test_gauss_bonnet.wls
+wolframscript -file tests/test_mean_curvature.wls
 ```
 
-More entry points will be added as the exploration grows.
+Both figures land in `docs/images/`. More entry points will be added as
+the exploration grows.
+
+### A note on test meshes
+
+`DiscretizeRegion[Sphere[…]]` produces an irregular triangulation with
+**inconsistently-oriented** triangles, which wrecks vertex normals and
+biases the cotangent mean-curvature estimate. The operators are therefore
+validated on a **regular geodesic icosphere** (`DDG`icosphereMesh`, an
+icosahedron subdivided and projected to the sphere) and a structured
+**torus grid** (`DDG`torusMesh`), both of which are consistently wound.
+On these, discrete mean curvature matches the smooth value to ~10⁻³ (sphere)
+and ~3×10⁻⁴ (torus).
 
 ## Status
 

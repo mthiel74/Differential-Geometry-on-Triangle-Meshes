@@ -21,29 +21,15 @@ sci[x_] := If[x == 0., "0",
 (* R = tube-centre radius, r = tube radius. Smooth Gaussian curvature is
    K(u,v) = cos(u) / (r (R + r cos(u))), u = angle around the tube.          *)
 R = 2.; r = 0.8;
-nu = 80; nv = 160;                     (* grid resolution around tube / ring *)
-
-torusPt[u_, v_] := {(R + r Cos[u]) Cos[v], (R + r Cos[u]) Sin[v], r Sin[u]};
-
-us = N[2 Pi Range[0, nu - 1]/nu];
-vs = N[2 Pi Range[0, nv - 1]/nv];
-
-coords = Flatten[Table[torusPt[u, v], {u, us}, {v, vs}], 1];
-idx[i_, j_] := Mod[i, nu] nv + Mod[j, nv] + 1;   (* 1-based, periodic wrap *)
-
-tris = Flatten[
-   Table[{{idx[i, j], idx[i + 1, j], idx[i + 1, j + 1]},
-          {idx[i, j], idx[i + 1, j + 1], idx[i, j + 1]}},
-     {i, 0, nu - 1}, {j, 0, nv - 1}], 2];
-
-torus = DDG`triMesh[coords, tris];
+torus = DDG`torusMesh[R, r, 80, 160];     (* nu x nv grid *)
+coords = DDG`meshCoords[torus];
+tris = DDG`meshTriangles[torus];
 Print["torus: ", Length[coords], " vertices, ", Length[tris], " triangles"];
 
 (* ---- discrete vs smooth Gaussian curvature on the torus ---------------- *)
+uvals = DDG`torusAngleU[coords, R, r];
 Kdiscrete = DDG`gaussianCurvature[torus];
-Ksmooth = MapThread[
-   Function[{u}, Cos[u]/(r (R + r Cos[u]))],
-   {Flatten[Table[u, {u, us}, {v, vs}]]}];
+Ksmooth = Cos[uvals]/(r (R + r Cos[uvals]));
 
 relErr = Norm[Kdiscrete - Ksmooth]/Norm[Ksmooth];
 Print["Gaussian curvature  discrete vs smooth  relative L2 error = ", sci[relErr]];
