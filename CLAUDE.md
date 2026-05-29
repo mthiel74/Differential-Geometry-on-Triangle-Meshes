@@ -10,11 +10,26 @@ Contiguous-Cartograms repos.
 ## Pipeline (pure Wolfram Language — no Python)
 
 ```
-wolfram/ddg.wl          shared package: mesh accessors + DDG operators
-wolfram/curvature.wls   angle-defect Gaussian curvature + Gauss–Bonnet check
-                        (more scripts added as the exploration grows)
-community/build_notebook.wls   assembles the community notebook (later)
+wolfram/ddg.wl          shared package: mesh accessors, test meshes
+                        (torusMesh, icosphereMesh) + DDG operators
+                        (cotanLaplacian, massMatrix, curvatures,
+                        implicitFairing, laplacianSpectrum)
+wolfram/curvature.wls   §1 angle-defect Gaussian curvature + Gauss–Bonnet
+wolfram/meancurvature.wls §1–2 cotan Laplacian + mean curvature
+wolfram/spectral.wls    §3 LBO eigenfunctions, sphere spectrum, smoothing
+wolfram/meanflow.wls    §4 mean-curvature flow (semi-implicit fairing)
+wolfram/run_all.wls     regenerate all figures, then build the notebook
+community/build_notebook.wls   assembles community/ddg.nb (+ .pdf)
+tests/test_*.wls        one sanity check per operator (all exit 0)
 ```
+
+## Narrative arc (the "one matrix" thread)
+
+The post follows the cotangent Laplacian through: curvature →
+Laplace–Beltrami → spectrum → mean-curvature flow → heat-method
+geodesics → DEC/Hodge. §1–4 are implemented; the heat method
+(Crane–Weischedel–Wardetzky 2013) and DEC/Hodge are next. This arc was
+cross-checked with Codex and Gemini (both converged on it independently).
 
 ## Conventions
 
