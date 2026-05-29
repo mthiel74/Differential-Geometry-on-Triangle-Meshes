@@ -23,6 +23,8 @@ cotanLaplacian::usage    = "cotanLaplacian[mr] returns the V*V cotangent Laplace
 vertexNormals::usage     = "vertexNormals[mr] returns area-weighted unit vertex normals; orientation follows the triangle winding.";
 meanCurvatureNormal::usage = "meanCurvatureNormal[mr] returns the per-vertex mean-curvature normal vector -(L.x)_i/(2 A_i) = kappaH n (Meyer et al. 2003).";
 meanCurvature::usage     = "meanCurvature[mr] returns the signed per-vertex mean curvature (mean-curvature normal projected on the unit vertex normal).";
+massMatrix::usage        = "massMatrix[mr] returns the diagonal (lumped) mass matrix of barycentric vertex areas.";
+implicitFairing::usage   = "implicitFairing[coords, tris, tau, n] runs n steps of semi-implicit mean-curvature flow (Desbrun et al. 1999): (M - tau L) x' = M x. Returns the list of coordinate frames (length n+1).";
 
 Begin["`Private`"];
 
@@ -142,6 +144,26 @@ meanCurvatureNormal[mr_MeshRegion] := Module[{l, a},
 
 meanCurvature[mr_MeshRegion] :=
   MapThread[Dot, {meanCurvatureNormal[mr], vertexNormals[mr]}];
+
+massMatrix[mr_MeshRegion] :=
+  SparseArray[Band[{1, 1}] -> vertexAreasBary[mr]];
+
+(* Semi-implicit mean-curvature flow / implicit fairing (Desbrun, Meyer,
+   Schroder, Barr 1999). The cotan operator L and mass M are rebuilt each
+   step from the current geometry (they depend on it).                     *)
+implicitFairing[coords0_, tris_, tau_, n_Integer] :=
+  Module[{frames, x, mr, l, m, a, solver},
+   x = N[coords0];
+   frames = {x};
+   Do[
+     mr = triMesh[x, tris];
+     l = cotanLaplacian[mr];
+     m = massMatrix[mr];
+     a = m - tau l;                 (* symmetric positive definite *)
+     x = LinearSolve[a, m . x];      (* solves the 3 coordinate columns *)
+     AppendTo[frames, x],
+     {n}];
+   frames];
 
 gaussBonnetCheck[mr_MeshRegion] := Module[{defect, chi, twoPiChi},
   defect = Total[angleDefect[mr]];
