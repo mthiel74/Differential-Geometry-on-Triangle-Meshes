@@ -11,6 +11,7 @@ scripts = {
    FileNameJoin[{dir, "spectral.wls"}],
    FileNameJoin[{dir, "meanflow.wls"}],
    FileNameJoin[{dir, "heat.wls"}],
+   FileNameJoin[{dir, "hodge.wls"}],
    FileNameJoin[{dir, "yoda.wls"}],
    FileNameJoin[{root, "community", "build_notebook.wls"}]};
 

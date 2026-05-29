@@ -63,6 +63,15 @@ wolframscript -file wolfram/spectral.wls
 # §4 Mean-curvature flow (semi-implicit fairing) + shrinking-sphere rate
 wolframscript -file wolfram/meanflow.wls
 
+# §5 Heat-method geodesic distance (sphere convergence + figures)
+wolframscript -file wolfram/heat.wls
+
+# §6 Discrete exterior calculus + Hodge decomposition on a torus
+wolframscript -file wolfram/hodge.wls
+
+# §7 The operators on a real 3D scan (decimated Yoda figurine)
+wolframscript -file wolfram/yoda.wls
+
 # Sanity checks (all exit 0)
 for t in tests/test_*.wls; do wolframscript -file "$t"; done
 
@@ -70,11 +79,14 @@ for t in tests/test_*.wls; do wolframscript -file "$t"; done
 wolframscript -file community/build_notebook.wls
 ```
 
-Figures land in `docs/images/`. The narrative arc — following the
-"one matrix (the cotangent Laplacian) does everything" thread — is:
-**curvature → Laplace–Beltrami → spectrum → curvature flow →
-heat-method geodesics → (DEC / Hodge)**. The first four are implemented;
-the heat method and DEC are next.
+Figures land in `docs/images/`. The narrative arc — the
+"one matrix (the cotangent Laplacian) does everything" thread —
+is **curvature → Laplace–Beltrami → spectrum → curvature flow →
+heat-method geodesics → DEC / Hodge decomposition**, all implemented and
+each validated against a smooth reference or a topological invariant.
+The same operators are then run on a **3D-scanned Yoda** figurine
+(decimated via `scripts/prepare_yoda.py`) to show they work on real,
+messy geometry.
 
 ### A note on test meshes
 
