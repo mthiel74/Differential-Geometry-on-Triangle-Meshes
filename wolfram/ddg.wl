@@ -26,6 +26,9 @@ meanCurvature::usage     = "meanCurvature[mr] returns the signed per-vertex mean
 massMatrix::usage        = "massMatrix[mr] returns the diagonal (lumped) mass matrix of barycentric vertex areas.";
 implicitFairing::usage   = "implicitFairing[coords, tris, tau, n] runs n steps of semi-implicit mean-curvature flow (Desbrun et al. 1999): (M - tau L) x' = M x. Returns the list of coordinate frames (length n+1).";
 laplacianSpectrum::usage = "laplacianSpectrum[mr, k] returns {values, vectors} for the k smallest eigenpairs of the generalized problem (-L) phi = lambda M phi (Laplace-Beltrami). Eigenvectors are rows, M-orthonormal. Dense solver: use for meshes up to ~1000 vertices.";
+faceGradient::usage      = "faceGradient[mr, u] returns the per-face gradient (one 3-vector per triangle) of a piecewise-linear vertex scalar u.";
+vertexDivergence::usage  = "vertexDivergence[mr, X] returns the per-vertex integrated divergence of a per-face vector field X (cotangent formula).";
+heatGeodesics::usage     = "heatGeodesics[mr, src] returns the per-vertex geodesic distance from vertex src by the heat method (Crane, Weischedel & Wardetzky 2013): diffuse, normalise the gradient, solve a Poisson problem.";
 
 Begin["`Private`"];
 
@@ -181,6 +184,64 @@ laplacianSpectrum[mr_MeshRegion, k_Integer] := Module[
    vals = Clip[vals[[ord]], {0., Infinity}];   (* tiny negatives -> 0 *)
    vecs = (isq # &) /@ vecs[[ord]];            (* map psi -> phi = M^-1/2 psi *)
    {vals, vecs}];
+
+(* ---- the heat method for geodesic distance (Crane et al. 2013) --------- *)
+(* row-wise cross products / dots for F-by-3 arrays *)
+crossRows[u_, v_] := u[[All, {2, 3, 1}]] v[[All, {3, 1, 2}]] -
+   u[[All, {3, 1, 2}]] v[[All, {2, 3, 1}]];
+dotRows[u_, v_] := Total[u v, {2}];
+cotRows[u_, v_] := dotRows[u, v]/Sqrt[Total[crossRows[u, v]^2, {2}]];
+
+faceGradient[mr_MeshRegion, u_] := Module[
+   {pts, tris, pi, pj, pk, ui, uj, uk, nrm, a2},
+   pts = meshCoords[mr]; tris = meshTriangles[mr];
+   pi = pts[[tris[[All, 1]]]]; pj = pts[[tris[[All, 2]]]]; pk = pts[[tris[[All, 3]]]];
+   ui = u[[tris[[All, 1]]]]; uj = u[[tris[[All, 2]]]]; uk = u[[tris[[All, 3]]]];
+   nrm = crossRows[pj - pi, pk - pi];          (* = 2A * unit normal *)
+   a2 = Sqrt[Total[nrm^2, {2}]];                (* = 2A *)
+   nrm = nrm/a2;
+   (* grad = (1/2A)(ui N x (pk-pj) + uj N x (pi-pk) + uk N x (pj-pi)) *)
+   (ui crossRows[nrm, pk - pj] + uj crossRows[nrm, pi - pk] +
+      uk crossRows[nrm, pj - pi])/a2];
+
+vertexDivergence[mr_MeshRegion, x_] := Module[
+   {pts, tris, pi, pj, pk, ci, cj, ck, di, dj, dk, n},
+   pts = meshCoords[mr]; tris = meshTriangles[mr]; n = Length[pts];
+   pi = pts[[tris[[All, 1]]]]; pj = pts[[tris[[All, 2]]]]; pk = pts[[tris[[All, 3]]]];
+   ci = cotRows[pj - pi, pk - pi];              (* cot of angle at i, j, k *)
+   cj = cotRows[pk - pj, pi - pj];
+   ck = cotRows[pi - pk, pj - pk];
+   (* contribution to each vertex of the face *)
+   di = 0.5 (ck dotRows[pj - pi, x] + cj dotRows[pk - pi, x]);
+   dj = 0.5 (ci dotRows[pk - pj, x] + ck dotRows[pi - pj, x]);
+   dk = 0.5 (cj dotRows[pi - pk, x] + ci dotRows[pj - pk, x]);
+   Lookup[Merge[Join[
+       Thread[tris[[All, 1]] -> di], Thread[tris[[All, 2]] -> dj],
+       Thread[tris[[All, 3]] -> dk]], Total], Range[n], 0.]];
+
+meanEdgeLength[mr_MeshRegion] := Module[{pts, tris},
+   pts = meshCoords[mr]; tris = meshTriangles[mr];
+   Mean[Flatten[{
+      Sqrt[Total[(pts[[tris[[All, 1]]]] - pts[[tris[[All, 2]]]])^2, {2}]],
+      Sqrt[Total[(pts[[tris[[All, 2]]]] - pts[[tris[[All, 3]]]])^2, {2}]],
+      Sqrt[Total[(pts[[tris[[All, 3]]]] - pts[[tris[[All, 1]]]])^2, {2}]]}]]];
+
+heatGeodesics[mr_MeshRegion, src_Integer] := Module[
+   {l, m, n, h, t, u, grad, gmag, x, div, phi},
+   l = cotanLaplacian[mr]; m = massMatrix[mr]; n = Length[meshCoords[mr]];
+   h = meanEdgeLength[mr]; t = h^2;
+   (* 1. diffuse heat from the source: (M - t L) u = delta_src *)
+   u = LinearSolve[m - t l, SparseArray[{src -> 1.}, n]];
+   (* 2. unit vector field pointing away from the source *)
+   grad = faceGradient[mr, u];
+   gmag = Sqrt[Total[grad^2, {2}]] + 1.*^-300;
+   x = -grad/gmag;
+   (* 3. Poisson reconstruction (-L) phi = div X, lightly regularised *)
+   div = vertexDivergence[mr, x];
+   phi = LinearSolve[-l + 1.*^-8 m, div];
+   phi = phi - phi[[src]];
+   (* fix the global sign so distance increases away from the source *)
+   If[Median[phi] < 0., -phi, phi]];
 
 gaussBonnetCheck[mr_MeshRegion] := Module[{defect, chi, twoPiChi},
   defect = Total[angleDefect[mr]];
