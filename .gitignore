@@ -4,8 +4,8 @@ data/raw/
 # Notebook build cache (regenerated on demand)
 community/.img-cache/
 
-# Large / regenerable mesh dumps
-data/*.obj
+# Large / regenerable mesh dumps (the small decimated data/yoda*.obj test
+# meshes ARE committed intentionally; bulk raw scans live in data/raw/)
 data/*.ply
 data/*.stl
 data/*.zip
