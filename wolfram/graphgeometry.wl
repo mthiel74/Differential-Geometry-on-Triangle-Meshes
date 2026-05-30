@@ -19,6 +19,7 @@ formanRicci::usage    = "formanRicci[g] returns <|edge -> curvature|> using the 
 formanRicciMean::usage = "formanRicciMean[g] returns the mean Forman-Ricci curvature over all edges.";
 ollivierRicciMean::usage = "ollivierRicciMean[g, n] estimates the mean Ollivier-Ricci curvature over a random sample of n edges (all edges if fewer).";
 graphDimension::usage = "graphDimension[g, rmax, nSamples] estimates the ball-growth dimension d from |B_r| ~ r^d (log-log slope), averaged over random centres. Returns <|\"d\"->.., \"radii\"->.., \"counts\"->..|>.";
+ricciCoarsen::usage   = "ricciCoarsen[g, frac] coarse-grains a graph by repeatedly contracting the edge of maximal Forman-Ricci curvature (the most redundant, clustered edge) until ~frac of the vertices remain. A fast, curvature-guided graph renormalization. ricciCoarsen[g, frac, labels] also returns the merged group each super-vertex came from.";
 meshGraph::usage      = "meshGraph[mr] returns the (undirected, unweighted) vertex-adjacency graph of a triangle MeshRegion.";
 
 Begin["`Private`"];
@@ -85,6 +86,31 @@ graphDimension[g_Graph, rmax_Integer, nSamples_Integer] := Module[
      (m Total[logr logn] - Total[logr] Total[logn])/
       (m Total[logr^2] - Total[logr]^2)];
    <|"d" -> slope, "radii" -> radii, "counts" -> counts|>];
+
+(* ---- Forman-guided coarsening (a curvature renormalization) ------------ *)
+(* Repeatedly contract the edge of maximal Forman-Ricci curvature -- the most
+   clustered, redundant edge -- merging local structure while preserving the
+   large-scale skeleton. Inline Forman keeps stable vertex ids so we can track
+   which original vertices each super-vertex absorbed.                        *)
+ricciCoarsen[g0_Graph, frac_] := ricciCoarsen[g0, frac, None];
+ricciCoarsen[g0_Graph, frac_, labels_] := Module[
+   {edges, members, n0, target, adj, deg, best, u, v, g, groups},
+   edges = DeleteDuplicates[Sort /@ (List @@@ EdgeList[IndexGraph[g0]])];
+   n0 = VertexCount[g0]; target = Max[1, Ceiling[frac n0]];
+   members = AssociationThread[Range[n0] -> (List /@ Range[n0])];
+   While[Length[members] > target && edges =!= {},
+     adj = Merge[Rule @@@ Join[edges, Reverse /@ edges], Identity];
+     deg = Length /@ adj;
+     best = First@MaximalBy[edges,
+        Function[ed, 4 - deg[ed[[1]]] - deg[ed[[2]]] +
+           3 Length[Intersection[adj[ed[[1]]], adj[ed[[2]]]]]]];
+     u = best[[1]]; v = best[[2]];
+     members[u] = Join[members[u], members[v]]; KeyDropFrom[members, v];
+     edges = DeleteCases[DeleteDuplicates[Sort /@ (edges /. v -> u)], {x_, x_}]];
+   g = Graph[Keys[members], UndirectedEdge @@@ edges];
+   If[labels === None, g,
+     groups = (Commonest[labels[[#]]][[1]] &) /@ Values[members];
+     {g, AssociationThread[Keys[members] -> groups], members}]];
 
 (* ---- mesh -> graph ----------------------------------------------------- *)
 meshGraph[mr_MeshRegion] := Module[{tris, edges},

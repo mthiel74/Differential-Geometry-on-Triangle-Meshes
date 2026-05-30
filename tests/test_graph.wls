@@ -41,9 +41,18 @@ fo = Correlation[(fA[#] &) /@ es,
    (GraphDDG`ollivierRicci[bg, {#[[1]], #[[2]]}, dist] &) /@ es];
 formanOK = fK > 0 && Abs[fCyc] < 0.01 && fTree < 0 && fo > 0.3;
 
+(* Forman-guided coarsening preserves the dimension of a 2D mesh-graph *)
+tgC = GraphDDG`meshGraph[DDG`torusMesh[2., 0.8, 22, 34]];
+dFull = GraphDDG`graphDimension[tgC, 7, 15]["d"];
+half = GraphDDG`ricciCoarsen[tgC, 0.5];
+dHalf = GraphDDG`graphDimension[half, Min[7, GraphDiameter[half] - 1], 15]["d"];
+coarsenOK = ConnectedGraphQ[half] && VertexCount[half] <= 0.55 VertexCount[tgC] &&
+   Abs[dHalf - dFull] < 0.25;
+Print["coarsening: d ", dFull, " -> ", dHalf, " at half the vertices"];
+
 pass = kComplete > 0.3 && Abs[kCycle] < 0.01 && kTree < -0.05 &&
    dRing < 1.2 && 1.4 < dTor2 < 2.2 && nDeg5 == 12 && 1.4 < dSphere < 2.2 && wmOK &&
-   formanOK;
+   formanOK && coarsenOK;
 Print["Forman: K6=", fK, " cycle=", fCyc, " tree=", fTree, " corr(F,ORC)=", fo];
 Print["ORC: K6=", kComplete, "  C8=", kCycle, "  tree=", kTree];
 Print["dim: ring=", dRing, "  2-torus=", dTor2, "  sphere graph=", dSphere];

@@ -17,6 +17,7 @@ scripts = {
    FileNameJoin[{dir, "wolframmodel.wls"}],
    FileNameJoin[{dir, "networkgallery.wls"}],
    FileNameJoin[{dir, "forman.wls"}],
+   FileNameJoin[{dir, "coarsen.wls"}],
    FileNameJoin[{dir, "yoda.wls"}],
    FileNameJoin[{root, "community", "build_notebook.wls"}]};
 
