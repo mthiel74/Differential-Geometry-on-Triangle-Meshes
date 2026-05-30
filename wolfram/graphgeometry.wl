@@ -15,7 +15,8 @@
 BeginPackage["GraphDDG`"];
 
 ollivierRicci::usage  = "ollivierRicci[g] returns <|edge -> curvature|> for every edge; ollivierRicci[g, {x,y}] one edge. Uniform neighbour measures, ground metric = graph distance.";
-formanRicci::usage    = "formanRicci[g] returns <|edge -> curvature|> using the (triangle-augmented) Forman-Ricci formula.";
+formanRicci::usage    = "formanRicci[g] returns <|edge -> curvature|> using the triangle-augmented Forman-Ricci formula F(u,v) = 4 - deg(u) - deg(v) + 3*(triangles on uv). Cheap and purely local.";
+formanRicciMean::usage = "formanRicciMean[g] returns the mean Forman-Ricci curvature over all edges.";
 ollivierRicciMean::usage = "ollivierRicciMean[g, n] estimates the mean Ollivier-Ricci curvature over a random sample of n edges (all edges if fewer).";
 graphDimension::usage = "graphDimension[g, rmax, nSamples] estimates the ball-growth dimension d from |B_r| ~ r^d (log-log slope), averaged over random centres. Returns <|\"d\"->.., \"radii\"->.., \"counts\"->..|>.";
 meshGraph::usage      = "meshGraph[mr] returns the (undirected, unweighted) vertex-adjacency graph of a triangle MeshRegion.";
@@ -58,13 +59,14 @@ ollivierRicciMean[g0_Graph, nSamples_Integer: 200] := Module[
    Mean[(ollivierRicci[g, {#[[1]], #[[2]]}, dist] &) /@ sample]];
 
 (* ---- Forman-Ricci (triangle-augmented, unit weights) ------------------- *)
-formanRicci[g_Graph] := Module[{ed, tri, triCount},
-  ed = EdgeList[g];
-  tri = FindCycle[g, {3}, All];   (* may be slow on large graphs *)
-  triCount[u_, v_] := Count[tri,
-    c_ /; SubsetQ[Union[Flatten[c /. UndirectedEdge -> List]], {u, v}]];
-  Association[(# -> With[{u = #[[1]], v = #[[2]]},
-       4 - VertexDegree[g, u] - VertexDegree[g, v] + 3 triCount[u, v]]) & /@ ed]];
+(* F(u,v) = 4 - deg(u) - deg(v) + 3*(# triangles on edge uv).  The triangle
+   count is just (A^2)_{uv}; everything is degrees + one sparse matrix square,
+   so this is far cheaper than the optimal-transport Ollivier-Ricci.          *)
+formanRicci[g0_Graph] := Module[{g = IndexGraph[g0], a, a2, deg, ed},
+  a = AdjacencyMatrix[g]; a2 = a . a; deg = Total[a]; ed = EdgeList[g];
+  Association[(# -> (4 - deg[[#[[1]]]] - deg[[#[[2]]]] + 3 a2[[#[[1]], #[[2]]]])) & /@ ed]];
+
+formanRicciMean[g_Graph] := Mean[N@Values[formanRicci[g]]];
 
 (* ---- emergent dimension from ball growth ------------------------------- *)
 graphDimension[g_Graph, rmax_Integer, nSamples_Integer] := Module[

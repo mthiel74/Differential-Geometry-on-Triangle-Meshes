@@ -27,8 +27,24 @@ wmOK = If[FileExistsQ[wmFile],
     ConnectedGraphQ[wg] && Mean[Values[GraphDDG`ollivierRicci[wg]]] < -0.05],
    True];
 
+(* Forman-Ricci: K6 positive, cycle flat, tree negative; and Forman correlates
+   positively with Ollivier-Ricci on a heterogeneous graph *)
+fK = GraphDDG`formanRicciMean[CompleteGraph[6]];
+fCyc = GraphDDG`formanRicciMean[CycleGraph[8]];
+fTree = GraphDDG`formanRicciMean[CompleteKaryTree[3, 3]];
+SeedRandom[5];
+bg = IndexGraph[First[SortBy[ConnectedGraphComponents[
+     RandomGraph[BarabasiAlbertGraphDistribution[120, 2]]], -VertexCount[#] &]]];
+fA = GraphDDG`formanRicci[bg]; dist = GraphDistanceMatrix[bg];
+es = RandomSample[EdgeList[bg], 60];
+fo = Correlation[(fA[#] &) /@ es,
+   (GraphDDG`ollivierRicci[bg, {#[[1]], #[[2]]}, dist] &) /@ es];
+formanOK = fK > 0 && Abs[fCyc] < 0.01 && fTree < 0 && fo > 0.3;
+
 pass = kComplete > 0.3 && Abs[kCycle] < 0.01 && kTree < -0.05 &&
-   dRing < 1.2 && 1.4 < dTor2 < 2.2 && nDeg5 == 12 && 1.4 < dSphere < 2.2 && wmOK;
+   dRing < 1.2 && 1.4 < dTor2 < 2.2 && nDeg5 == 12 && 1.4 < dSphere < 2.2 && wmOK &&
+   formanOK;
+Print["Forman: K6=", fK, " cycle=", fCyc, " tree=", fTree, " corr(F,ORC)=", fo];
 Print["ORC: K6=", kComplete, "  C8=", kCycle, "  tree=", kTree];
 Print["dim: ring=", dRing, "  2-torus=", dTor2, "  sphere graph=", dSphere];
 Print["sphere degree-5 defects = ", nDeg5, " (expect 12)"];
