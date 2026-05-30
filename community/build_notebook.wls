@@ -423,6 +423,24 @@ tableCell[Grid[{
    {"binary tree", "\[Minus]0.21", "negatively curved"}},
   Frame -> All, FrameStyle -> GrayLevel[0.8], Spacings -> {2, 1.1},
   Background -> {None, {RGBColor[0.93, 0.95, 0.99], None}}, Alignment -> Left]],
+para[{"Ollivier-Ricci is principled but costs a linear program per edge. A \
+cheap alternative is ", bold["Forman-Ricci"], ", a purely local count,"}],
+dm[HoldForm[F[u, v] == 4 - deg[u] - deg[v] + 3 \[Times] (\[ScriptCapitalT][u, v])]],
+para[{"where ", e[RowBox[{"\[ScriptCapitalT]", "(", "u", ",", "v", ")"}]],
+  " is the number of triangles on edge (", ital["u"], ",", ital["v"], ") \
+\[LongDash] just degrees and one sparse matrix-square, about 100\[Times] faster \
+than the transport computation. How well does the cheap proxy track the \
+expensive one? Edge-by-edge they are strongly correlated (r \[TildeTilde] 0.6 on \
+a scale-free network, 0.94 on a clustered random geometric graph), so Forman is \
+an excellent fast screen for curvature hot-spots; but it carries a \
+degree-induced negative bias \[LongDash] it reads a flat square grid as \
+\[Minus]2.9 where Ollivier correctly reads 0 \[LongDash] so it captures ",
+  ital["relative"], " curvature, not the absolute geometric value:"}],
+imgCell["forman_vs_ollivier.png", 620],
+captionCell["Figure 6. Forman-Ricci vs Ollivier-Ricci, edge by edge. The cheap, \
+degree-based Forman curvature correlates strongly with the transport-based \
+Ollivier curvature \[LongDash] a fast proxy \[LongDash] though offset by the \
+degree term."],
 para[{"Now point this at our own meshes, ", ital["as graphs"],
   ". A geodesic sphere is almost a hexagonal tiling \[LongDash] but Euler's \
 formula forbids tiling a sphere with hexagons alone. Exactly ", bold["twelve"],
@@ -447,7 +465,7 @@ characteristic finite-size underestimate from the discrete ball corrections), \
 and our sphere and torus mesh-graphs both come out two-dimensional \[LongDash] \
 read purely from their connectivity, with no coordinates at all:"}],
 imgCell["graph_dimension.png", 600],
-captionCell["Figure 6. Emergent dimension from ball growth. The log-log slopes \
+captionCell["Figure 7. Emergent dimension from ball growth. The log-log slopes \
 separate 1D (ring), 2D (2-torus and both mesh-graphs) and 3D (3-torus)."],
 
 (* ====================== 10. Wolfram Physics ====================== *)
@@ -460,7 +478,7 @@ structure of such a graph. Here is one hypergraph after a few generations of the
 rule ", e[ToBoxes[TraditionalForm[HoldForm[{{1, 2, 3}} ->
      {{1, 2, 4}, {4, 3, 5}, {5, 2, 1}}]]]], ":"}],
 imgCell["wm_hypergraph.png", 380],
-captionCell["Figure 7. A Wolfram-model hypergraph (the spatial graph of a \
+captionCell["Figure 8. A Wolfram-model hypergraph (the spatial graph of a \
 rewriting system)."],
 para[{"We can interrogate its geometry with the very same tools. Its geodesic \
 balls grow ", ital["faster"], " than any power of ", ital["r"],
@@ -470,19 +488,19 @@ average (mean \[TildeTilde] \[Minus]0.13) with strongly negative spikes (to \
 curved, tree-like"], " emergent space \[LongDash] the opposite of the flat \
 lattices and the two-dimensional mesh-graphs above."}],
 imgCell["wm_curvature.png", 520],
-captionCell["Figure 8. The Wolfram-model spatial graph coloured by Ollivier-Ricci \
+captionCell["Figure 9. The Wolfram-model spatial graph coloured by Ollivier-Ricci \
 curvature (blue = negative): a negatively curved, tree-like emergent geometry."],
 hd2["A gallery of networks"],
 para[{"The two probes \[LongDash] curvature \[Kappa] and dimension ", ital["d"],
   " \[LongDash] are a general lens, so we turn them on a small zoo of networks. \
 Each is laid out, then placed in the ", ital["curvature-dimension plane"], ":"}],
 imgCell["network_gallery.png", 620],
-captionCell["Figure 9. A geometric zoo: periodic lattices, a random geometric \
+captionCell["Figure 10. A geometric zoo: periodic lattices, a random geometric \
 graph, a small-world (Watts\[Dash]Strogatz) and a scale-free (Barab\[AAcute]si\
 \[Dash]Albert) network, and a Wolfram-model hypergraph, each labelled with its \
 estimated dimension and mean Ollivier-Ricci curvature."],
 imgCell["network_plane.png", 580],
-captionCell["Figure 10. The curvature-dimension plane. The \[Kappa] = 0 line is \
+captionCell["Figure 11. The curvature-dimension plane. The \[Kappa] = 0 line is \
 the robust classifier: lattices sit on it (Euclidean), the clustered random \
 geometric graph rises above it (positively curved), and the small-world, \
 scale-free and Wolfram-model networks fall below (negatively curved). Ball-growth \
@@ -497,6 +515,23 @@ with an integer-ish dimension; ", ital["small-world"], " structure \[LongDash] \
 shortcuts, hubs \[LongDash] shows up as negative curvature and a runaway, \
 ill-defined dimension. This is exactly the diagnostic the search for a \
 physically realistic Wolfram-model rule needs."}],
+hd2["A small rule-search"],
+para[{"So we ran that diagnostic as a search: screen many candidate rules by \
+how their vertex count grows with each generation \[LongDash] ", ital["V"], "(",
+  ital["g"], ") ~ ", ital["g"], e[SuperscriptBox["", "d"]],
+  " marks a ", ital["d"], "-dimensional space, while ", ital["V"], " ~ ",
+  ital["c"], e[SuperscriptBox["", "g"]], " marks an exponentially-growing \
+(hyperbolic) one \[LongDash] then measure the ball-growth dimension and \
+Ollivier-Ricci of the survivors. Across twenty rules the result is a stark ",
+  bold["\"missing middle\""], ": eleven grow exponentially, the rest are \
+one-dimensional or trivial, and ", bold["not one"], " lands in the flat, \
+finite-dimensional 2D/3D band."}],
+imgCell["wm_rule_search.png", 660],
+captionCell["Figure 12. A 20-rule search. Left: the emergent geometry is either \
+~1D or exponential \[LongDash] the flat 2D/3D regime is empty. Right: a 1D rule \
+and an exponential rule bracket, but never occupy, the ", ital["g"],
+  StyleBox["\.b2", FontSize -> 9], "/", ital["g"], StyleBox["\.b3", FontSize -> 9],
+  " growth a 2D/3D space would show."],
 thmBox["The open problem.",
   {"Most simple rules give either 1-dimensional or exponentially-growing \
 (hyperbolic) space. Finding rules whose large-scale limit is flat and \
@@ -521,7 +556,9 @@ tableCell[Grid[{
    {"Hodge", "harmonic dim = 2g", "torus 2, sphere 0"},
    {"Ollivier-Ricci", "K\:2086>0, cycle/grid=0, tree<0", "signs correct"},
    {"emergent dimension", "periodic lattices", "1, 2, 3 recovered"},
-   {"soccer-ball theorem", "sphere degree-5 defects", "exactly 12"}},
+   {"soccer-ball theorem", "sphere degree-5 defects", "exactly 12"},
+   {"Forman vs Ollivier", "per-edge correlation", "r = 0.6 \[Dash] 0.9"},
+   {"rule search", "flat 2D/3D rule in 20", "none found"}},
   Frame -> All, FrameStyle -> GrayLevel[0.8], Spacings -> {2, 1.1},
   Background -> {None, {RGBColor[0.93, 0.95, 0.99], None}}, Alignment -> Left]],
 
@@ -545,6 +582,8 @@ ref["Crane, K. ", ital["Discrete Differential Geometry: An Applied Introduction"
     "https://www.cs.cmu.edu/~kmcrane/Projects/DDG/"]],
 ref["Botsch, M., Kobbelt, L., Pauly, M., Alliez, P., L\[EAcute]vy, B. (2010). ",
   ital["Polygon Mesh Processing."], " AK Peters."],
+ref["Forman, R. (2003). ", ital["Bochner's method for cell complexes and \
+combinatorial Ricci curvature."], " Discrete & Computational Geometry 29, 323\[Dash]374."],
 ref["Ollivier, Y. (2009). ", ital["Ricci curvature of Markov chains on metric \
 spaces."], " J. Functional Analysis 256, 810\[Dash]864."],
 ref["Wolfram, S. (2020). ", ital["A Project to Find the Fundamental Theory of \
@@ -568,6 +607,9 @@ wolframscript -file wolfram/convergence.wls   # \[Section]7  order of accuracy
 wolframscript -file wolfram/yoda.wls          # \[Section]8  the 3D scan
 wolframscript -file wolfram/graphcurvature.wls # \[Section]9  graph curvature + dimension
 wolframscript -file wolfram/wolframmodel.wls  # \[Section]10 Wolfram-model hypergraph
+wolframscript -file wolfram/networkgallery.wls # \[Section]10 network gallery
+wolframscript -file wolfram/forman.wls        # \[Section]9  Forman vs Ollivier
+# scripts/search_wolframmodel.wls  -- one-off rule search (needs internet)
 wolframscript -file wolfram/models.wls        # live rotatable models
 wolframscript -file community/build_notebook.wls   # this notebook
 # wolfram/run_all.wls runs the whole pipeline end to end."],

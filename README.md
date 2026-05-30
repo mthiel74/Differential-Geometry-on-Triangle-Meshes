@@ -105,8 +105,13 @@ tree −), **emergent dimension** from ball growth (recovers 1/2/3 on lattices
 and ≈2 on the mesh-graphs), the **soccer-ball theorem** (a sphere's mesh-graph
 carries positive curvature at exactly 12 degree-5 defects — a combinatorial
 Gauss–Bonnet), and a bridge to the **Wolfram Physics Project**: the same tools
-show a rewriting hypergraph grows a *hyperbolic* (negatively curved,
-super-polynomial) emergent space. `wolfram/graphgeometry.wl` holds the graph
+show a rewriting hypergraph grows a *negatively curved* (super-polynomial)
+emergent space. A 20-rule **search** (`scripts/search_wolframmodel.wls`) finds
+a stark "missing middle" — rules give either ~1D or exponential growth, **none
+flat 2D/3D** — quantifying why physically realistic rules are hard to find.
+**Forman–Ricci** (`wolfram/forman.wls`) is added as a ~100× faster, degree-based
+complement to Ollivier–Ricci; the two correlate per-edge (r≈0.6–0.9) but Forman
+carries a degree-induced offset. `wolfram/graphgeometry.wl` holds the graph
 operators.
 
 Figures land in `docs/images/`. The narrative arc — the
