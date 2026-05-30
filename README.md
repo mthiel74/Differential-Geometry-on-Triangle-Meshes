@@ -69,8 +69,14 @@ wolframscript -file wolfram/heat.wls
 # §6 Discrete exterior calculus + Hodge decomposition on a torus
 wolframscript -file wolfram/hodge.wls
 
-# §7 The operators on a real 3D scan (decimated Yoda figurine)
+# §7 Convergence / order-of-accuracy study (curvature O(h²), geodesics, Gauss–Bonnet)
+wolframscript -file wolfram/convergence.wls
+
+# §8 The operators on a real 3D scan (decimated Yoda figurine)
 wolframscript -file wolfram/yoda.wls
+
+# Export live rotatable Graphics3D for the notebook (docs/models/*.wxf)
+wolframscript -file wolfram/models.wls
 
 # Sanity checks (all exit 0)
 for t in tests/test_*.wls; do wolframscript -file "$t"; done
@@ -78,6 +84,14 @@ for t in tests/test_*.wls; do wolframscript -file "$t"; done
 # Build the Wolfram Community notebook (community/ddg.nb + .pdf)
 wolframscript -file community/build_notebook.wls
 ```
+
+The notebook embeds the 3D figures as **live, rotatable `Graphics3D`**
+objects (drag to rotate in the front end / on Wolfram Community), and adds
+the deeper theory — shape operator and *Theorema Egregium*, Weyl's law and
+Shape-DNA, the CFL stability bound, the cut locus, de Rham cohomology — plus
+a measured **order-of-accuracy** study (§7): the pointwise operators are
+second order (p≈2), the heat method sub-linear, and Gauss–Bonnet exact at
+every resolution.
 
 Figures land in `docs/images/`. The narrative arc — the
 "one matrix (the cotangent Laplacian) does everything" thread —
