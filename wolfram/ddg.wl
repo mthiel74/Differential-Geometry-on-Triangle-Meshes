@@ -28,6 +28,7 @@ implicitFairing::usage   = "implicitFairing[coords, tris, tau, n] runs n steps o
 laplacianSpectrum::usage = "laplacianSpectrum[mr, k] returns {values, vectors} for the k smallest eigenpairs of the generalized problem (-L) phi = lambda M phi (Laplace-Beltrami). Eigenvectors are rows, M-orthonormal. Dense solver: use for meshes up to ~1000 vertices.";
 faceGradient::usage      = "faceGradient[mr, u] returns the per-face gradient (one 3-vector per triangle) of a piecewise-linear vertex scalar u.";
 vertexDivergence::usage  = "vertexDivergence[mr, X] returns the per-vertex integrated divergence of a per-face vector field X (cotangent formula).";
+meanEdgeLength::usage    = "meanEdgeLength[mr] returns the mean edge length of the mesh.";
 heatGeodesics::usage     = "heatGeodesics[mr, src] returns the per-vertex geodesic distance from vertex src by the heat method (Crane, Weischedel & Wardetzky 2013): diffuse, normalise the gradient, solve a Poisson problem.";
 decOperators::usage      = "decOperators[mr] returns a discrete-exterior-calculus toolkit <|edges, d0, d1, star0, star1, star2|>: oriented edges, exterior derivatives d0 (V->E) and d1 (E->F), and diagonal Hodge stars.";
 bettiOne::usage          = "bettiOne[mr] returns the first Betti number b1 = E - rank(d0) - rank(d1) = dim of the harmonic 1-forms (= 2*genus for a closed surface).";
