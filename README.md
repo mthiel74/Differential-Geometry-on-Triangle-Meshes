@@ -75,6 +75,12 @@ wolframscript -file wolfram/convergence.wls
 # §8 The operators on a real 3D scan (decimated Yoda figurine)
 wolframscript -file wolfram/yoda.wls
 
+# §9 Discrete curvature + emergent dimension on graphs (Ollivier–Ricci, ball growth)
+wolframscript -file wolfram/graphcurvature.wls
+
+# §10 A Wolfram-Physics hypergraph: emergent (hyperbolic) geometry
+wolframscript -file wolfram/wolframmodel.wls
+
 # Export live rotatable Graphics3D for the notebook (docs/models/*.wxf)
 wolframscript -file wolfram/models.wls
 
@@ -92,6 +98,16 @@ Shape-DNA, the CFL stability bound, the cut locus, de Rham cohomology — plus
 a measured **order-of-accuracy** study (§7): the pointwise operators are
 second order (p≈2), the heat method sub-linear, and Gauss–Bonnet exact at
 every resolution.
+
+The project then goes **beyond meshes to graphs** (§9–10): **Ollivier–Ricci
+curvature** via optimal transport (validated: complete graph +, cycle/grid 0,
+tree −), **emergent dimension** from ball growth (recovers 1/2/3 on lattices
+and ≈2 on the mesh-graphs), the **soccer-ball theorem** (a sphere's mesh-graph
+carries positive curvature at exactly 12 degree-5 defects — a combinatorial
+Gauss–Bonnet), and a bridge to the **Wolfram Physics Project**: the same tools
+show a rewriting hypergraph grows a *hyperbolic* (negatively curved,
+super-polynomial) emergent space. `wolfram/graphgeometry.wl` holds the graph
+operators.
 
 Figures land in `docs/images/`. The narrative arc — the
 "one matrix (the cotangent Laplacian) does everything" thread —

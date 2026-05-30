@@ -118,7 +118,10 @@ state the smooth object, derive the discrete one, and report the check that pins
 it down \[LongDash] including the measured ", ital["order of accuracy"],
   ". A single sparse matrix, the ", bold["cotangent Laplacian"],
   ", drives all of it. The 3D figures are ", bold["live: drag to rotate them"],
-  ". The same operators are then run unchanged on a 3D-scanned figurine."}],
+  ". The same operators are then run unchanged on a 3D-scanned figurine, and \
+finally pushed beyond meshes to ", bold["graphs"], " \[LongDash] Ollivier-Ricci \
+curvature and emergent dimension \[LongDash] bridging to the discrete geometry of \
+the ", bold["Wolfram Physics Project"], "."}],
 
 (* ====================== 0. Discrete world ======================== *)
 hd1["0.  The discrete world: meshes and a dictionary"],
@@ -392,10 +395,93 @@ with the eigenvalue. The DDG operators degrade gracefully on messy, \
 boundary-carrying geometry \[LongDash] which is why they underpin real \
 geometry-processing software."],
 
-(* ====================== 9. Validation ============================ *)
-hd1["9.  Validation summary"],
-para[{"Nothing above is asserted without a check against a smooth reference or a \
-topological invariant:"}],
+(* ====================== 9. Graphs ================================ *)
+hd1["9.  From meshes to networks: discrete curvature on graphs"],
+para[{"A triangle mesh is, underneath, just a ", bold["graph"],
+  " \[LongDash] vertices joined by edges. Strip away the coordinates and ask: \
+how much geometry survives in the bare combinatorics? This is the question of \
+network science and of the ", bold["Wolfram Physics Project"], ", where space \
+itself is meant to ", ital["emerge"], " from a graph. Remarkably, both curvature \
+and dimension can be read off connectivity alone."}],
+para[{"The cleanest notion of graph curvature is ", bold["Ollivier-Ricci"], ". \
+Put a probability measure ", e[SubscriptBox["m", "x"]], " on each vertex's \
+neighbours and compare neighbouring vertices by ", ital["optimal transport"],
+  ": the curvature of edge (", ital["x"], ",", ital["y"], ") is"}],
+dm[HoldForm[\[Kappa][x, y] == 1 - Subscript[W, 1][Subscript[m, x], Subscript[m, y]]/d[x, y]]],
+para[{"where ", e[SubscriptBox["W", "1"]], " is the Wasserstein-1 (earth-mover) \
+distance and ", ital["d"], " the graph distance. The intuition is Ricci \
+curvature's own: if neighbourhoods are ", ital["closer"], " than their centres \
+(overlapping, easy to transport) the curvature is positive; if ", ital["farther"],
+  " (as at a tree's branch points) it is negative; flat if equal. We solve the \
+transport as a small linear program. The signs come out exactly as geometry \
+predicts:"}],
+tableCell[Grid[{
+   {Style["graph", Bold], Style["mean Ollivier-Ricci", Bold], Style["geometry", Bold]},
+   {"complete K\:2086", "+0.80", "very positively curved"},
+   {"cycle C\:2088", "0.00", "flat (1-dimensional)"},
+   {"6\[Times]6 grid", "0.00", "flat (2-dimensional)"},
+   {"binary tree", "\[Minus]0.21", "negatively curved"}},
+  Frame -> All, FrameStyle -> GrayLevel[0.8], Spacings -> {2, 1.1},
+  Background -> {None, {RGBColor[0.93, 0.95, 0.99], None}}, Alignment -> Left]],
+para[{"Now point this at our own meshes, ", ital["as graphs"],
+  ". A geodesic sphere is almost a hexagonal tiling \[LongDash] but Euler's \
+formula forbids tiling a sphere with hexagons alone. Exactly ", bold["twelve"],
+  " pentagons (degree-5 vertices) are forced, and that is precisely where the \
+positive Ollivier-Ricci curvature concentrates: the ", ital["soccer-ball \
+theorem"], ", a combinatorial face of Gauss\[Dash]Bonnet (\[Chi] = 2). Rotate the \
+sphere to find its twelve defects:"}],
+liveCell["soccer", 400],
+rotNote,
+para[{"The structured torus, by contrast, is a ", ital["perfect"],
+  " triangular lattice \[LongDash] every vertex has degree 6 \[LongDash] so its \
+Ollivier-Ricci curvature is zero everywhere, the combinatorial signature of an \
+intrinsically flat surface (\[Chi] = 0). The graph cannot see the embedding's \
+bending, only its intrinsic, topological curvature."}],
+para[{"Dimension, too, is emergent. In ", ital["d"], "-dimensional space a ball \
+of radius ", ital["r"], " holds \[TildeTilde]", ital["r"], e[SuperscriptBox["", "d"]],
+  " points, so growing geodesic balls on the graph and fitting"}],
+dm[HoldForm[Abs[Subscript[B, r]] \[Tilde] Superscript[r, d] \[DoubleLongRightArrow]
+   d == Limit[Log[Abs[Subscript[B, r]]]/Log[r], r -> \[Infinity]]]],
+para[{"recovers the dimension. On periodic lattices it returns 1, 2, 3 (with a \
+characteristic finite-size underestimate from the discrete ball corrections), \
+and our sphere and torus mesh-graphs both come out two-dimensional \[LongDash] \
+read purely from their connectivity, with no coordinates at all:"}],
+imgCell["graph_dimension.png", 600],
+captionCell["Figure 6. Emergent dimension from ball growth. The log-log slopes \
+separate 1D (ring), 2D (2-torus and both mesh-graphs) and 3D (3-torus)."],
+
+(* ====================== 10. Wolfram Physics ====================== *)
+hd1["10.  A Wolfram-Physics bridge: emergent geometry of a hypergraph"],
+para[{"The Wolfram model evolves a ", bold["hypergraph"],
+  " by a rewriting rule, applied everywhere it matches, over and over. The hope \
+of the Wolfram Physics Project is that physical space \[LongDash] continuous, \
+three-dimensional, gently curved \[LongDash] emerges from the large-scale \
+structure of such a graph. Here is one hypergraph after a few generations of the \
+rule ", e[ToBoxes[TraditionalForm[HoldForm[{{1, 2, 3}} ->
+     {{1, 2, 4}, {4, 3, 5}, {5, 2, 1}}]]]], ":"}],
+imgCell["wm_hypergraph.png", 380],
+captionCell["Figure 7. A Wolfram-model hypergraph (the spatial graph of a \
+rewriting system)."],
+para[{"We can interrogate its geometry with the very same tools. Its geodesic \
+balls grow ", ital["faster"], " than any power of ", ital["r"],
+  " (no finite dimension), and its mean Ollivier-Ricci curvature is strongly \
+negative (\[TildeTilde]\[Minus]1.0): this rule grows a ", bold["hyperbolic"],
+  ", tree-like emergent space \[LongDash] the opposite of the flat lattices and \
+the two-dimensional mesh-graphs above."}],
+imgCell["wm_curvature.png", 520],
+captionCell["Figure 8. The Wolfram-model spatial graph coloured by Ollivier-Ricci \
+curvature (blue = negative): a hyperbolic emergent geometry."],
+thmBox["The open problem.",
+  {"Most simple rules give either 1-dimensional or exponentially-growing \
+(hyperbolic) space. Finding rules whose large-scale limit is flat and \
+finite-dimensional \[LongDash] like the 3+1-dimensional space we live in \
+\[LongDash] is the central challenge of the programme. The discrete-geometry \
+toolkit of this notebook is exactly what one needs to test a candidate rule."}],
+
+(* ====================== 11. Validation =========================== *)
+hd1["11.  Validation summary"],
+para[{"Nothing above is asserted without a check against a smooth reference, a \
+conservation law, or a topological invariant:"}],
 tableCell[Grid[{
    {Style["quantity", Bold], Style["test", Bold], Style["result", Bold]},
    {"Gaussian curvature", "vs analytic torus K; order", "5\[Times]10\:207b\:2074 ; p=1.99"},
@@ -406,12 +492,15 @@ tableCell[Grid[{
    {"mean-curvature flow", "d(R\.b2)/dt = \[Minus]4", "\[Minus]3.98"},
    {"heat geodesics", "vs arccos(z); order", "1.3%\[Rule]0.67% ; p=0.59"},
    {"DEC", "d\.b2=0 ; L=d\:2080\[Transpose]\[Star]\:2081 d\:2080", "exact (0)"},
-   {"Hodge", "harmonic dim = 2g", "torus 2, sphere 0"}},
+   {"Hodge", "harmonic dim = 2g", "torus 2, sphere 0"},
+   {"Ollivier-Ricci", "K\:2086>0, cycle/grid=0, tree<0", "signs correct"},
+   {"emergent dimension", "periodic lattices", "1, 2, 3 recovered"},
+   {"soccer-ball theorem", "sphere degree-5 defects", "exactly 12"}},
   Frame -> All, FrameStyle -> GrayLevel[0.8], Spacings -> {2, 1.1},
   Background -> {None, {RGBColor[0.93, 0.95, 0.99], None}}, Alignment -> Left]],
 
-(* ====================== 10. References =========================== *)
-hd1["10.  References"],
+(* ====================== 12. References =========================== *)
+hd1["12.  References"],
 ref["Meyer, M., Desbrun, M., Schr\[ODoubleDot]der, P., Barr, A. (2003). ",
   ital["Discrete differential-geometry operators for triangulated 2-manifolds."],
   " Visualization and Mathematics III, 35\[Dash]57."],
@@ -430,9 +519,13 @@ ref["Crane, K. ", ital["Discrete Differential Geometry: An Applied Introduction"
     "https://www.cs.cmu.edu/~kmcrane/Projects/DDG/"]],
 ref["Botsch, M., Kobbelt, L., Pauly, M., Alliez, P., L\[EAcute]vy, B. (2010). ",
   ital["Polygon Mesh Processing."], " AK Peters."],
+ref["Ollivier, Y. (2009). ", ital["Ricci curvature of Markov chains on metric \
+spaces."], " J. Functional Analysis 256, 810\[Dash]864."],
+ref["Wolfram, S. (2020). ", ital["A Project to Find the Fundamental Theory of \
+Physics."], " Wolfram Media. ", link["wolframphysics.org", "https://www.wolframphysics.org/"]],
 
-(* ====================== 11. Reproducibility ====================== *)
-hd1["11.  Reproducibility"],
+(* ====================== 13. Reproducibility ====================== *)
+hd1["13.  Reproducibility"],
 para[{"All code is pure Wolfram Language. The package ", mono["wolfram/ddg.wl"],
   " defines the mesh accessors, test meshes and operators; each section's \
 figures come from one standalone script, and every operator has a sanity check \
@@ -447,6 +540,8 @@ wolframscript -file wolfram/heat.wls          # \[Section]5  heat-method geodesi
 wolframscript -file wolfram/hodge.wls         # \[Section]6  DEC + Hodge
 wolframscript -file wolfram/convergence.wls   # \[Section]7  order of accuracy
 wolframscript -file wolfram/yoda.wls          # \[Section]8  the 3D scan
+wolframscript -file wolfram/graphcurvature.wls # \[Section]9  graph curvature + dimension
+wolframscript -file wolfram/wolframmodel.wls  # \[Section]10 Wolfram-model hypergraph
 wolframscript -file wolfram/models.wls        # live rotatable models
 wolframscript -file community/build_notebook.wls   # this notebook
 # wolfram/run_all.wls runs the whole pipeline end to end."],

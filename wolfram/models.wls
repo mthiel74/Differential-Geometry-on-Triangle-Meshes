@@ -6,6 +6,7 @@
    GitHub (which cannot show interactive graphics).                          *)
 
 Needs["DDG`", FileNameJoin[{DirectoryName[$InputFileName], "ddg.wl"}]];
+Needs["GraphDDG`", FileNameJoin[{DirectoryName[$InputFileName], "graphgeometry.wl"}]];
 modelDir = FileNameJoin[{ParentDirectory[DirectoryName[$InputFileName]], "docs", "models"}];
 If[! DirectoryQ[modelDir], CreateDirectory[modelDir]];
 
@@ -90,5 +91,14 @@ yh = DDG`meanCurvature[yoda]; yh = Sign[Median[yh]] yh;
 save["yoda_H", surf[yp, yt,
    Map[ColorData["ThermometerColors"], Rescale[Clip[yh, {ylo, yhi}], {ylo, yhi}]],
    Sequence @@ yview, PlotLabel -> "mean curvature on the scan"]];
+
+(* ---- 7. graph geometry: the sphere mesh-graph "soccer ball" defects ---- *)
+ico = DDG`icosphereMesh[3]; ipp = DDG`meshCoords[ico]; itt = DDG`meshTriangles[ico];
+deg5 = Flatten@Position[VertexDegree[GraphDDG`meshGraph[ico]], 5];
+save["soccer", Graphics3D[{
+    {EdgeForm[GrayLevel[0.45]], FaceForm[GrayLevel[0.92]], GraphicsComplex[ipp, Polygon[itt]]},
+    {RGBColor[0.85, 0.15, 0.15], Sphere[ipp[[#]], 0.05] & /@ deg5}},
+   Boxed -> False, Lighting -> "Neutral", SphericalRegion -> True, ImageSize -> 420,
+   PlotLabel -> "12 curvature defects on a hexagonal sphere"]];
 
 Print["done."];
