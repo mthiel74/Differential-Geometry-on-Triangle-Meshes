@@ -14,6 +14,7 @@ scripts = {
    FileNameJoin[{dir, "hodge.wls"}],
    FileNameJoin[{dir, "convergence.wls"}],
    FileNameJoin[{dir, "graphcurvature.wls"}],
+   FileNameJoin[{dir, "wolframmodel.wls"}],
    FileNameJoin[{dir, "yoda.wls"}],
    FileNameJoin[{root, "community", "build_notebook.wls"}]};
 
