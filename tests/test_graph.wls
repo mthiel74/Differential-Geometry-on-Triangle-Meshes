@@ -24,7 +24,7 @@ dSphere = GraphDDG`graphDimension[icoG, 7, 20]["d"];
 wmFile = FileNameJoin[{ParentDirectory[DirectoryName[$InputFileName]], "data", "wm_graph.wxf"}];
 wmOK = If[FileExistsQ[wmFile],
    With[{wg = Import[wmFile]},
-    ConnectedGraphQ[wg] && Mean[Values[GraphDDG`ollivierRicci[wg]]] < -0.2],
+    ConnectedGraphQ[wg] && Mean[Values[GraphDDG`ollivierRicci[wg]]] < -0.05],
    True];
 
 pass = kComplete > 0.3 && Abs[kCycle] < 0.01 && kTree < -0.05 &&

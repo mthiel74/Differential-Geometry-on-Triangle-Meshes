@@ -16,6 +16,7 @@ BeginPackage["GraphDDG`"];
 
 ollivierRicci::usage  = "ollivierRicci[g] returns <|edge -> curvature|> for every edge; ollivierRicci[g, {x,y}] one edge. Uniform neighbour measures, ground metric = graph distance.";
 formanRicci::usage    = "formanRicci[g] returns <|edge -> curvature|> using the (triangle-augmented) Forman-Ricci formula.";
+ollivierRicciMean::usage = "ollivierRicciMean[g, n] estimates the mean Ollivier-Ricci curvature over a random sample of n edges (all edges if fewer).";
 graphDimension::usage = "graphDimension[g, rmax, nSamples] estimates the ball-growth dimension d from |B_r| ~ r^d (log-log slope), averaged over random centres. Returns <|\"d\"->.., \"radii\"->.., \"counts\"->..|>.";
 meshGraph::usage      = "meshGraph[mr] returns the (undirected, unweighted) vertex-adjacency graph of a triangle MeshRegion.";
 
@@ -41,11 +42,20 @@ ollivierRicci[g_Graph, {x_, y_}, dist_] := Module[{nx, ny, w1},
 ollivierRicci[g_Graph, {x_, y_}] :=
   ollivierRicci[g, {x, y}, GraphDistanceMatrix[g]];
 
-ollivierRicci[g_Graph] := Module[{vl, idx, dist, ed},
-  vl = VertexList[g]; idx = First /@ PositionIndex[vl];
+(* the core works in position space, so relabel vertices to 1..n first
+   (IndexGraph); otherwise AdjacencyList[g, position] would use the position
+   as a vertex name and silently return wrong neighbours. *)
+ollivierRicci[g0_Graph] := Module[{g = IndexGraph[g0], dist, ed},
   dist = GraphDistanceMatrix[g];
   ed = EdgeList[g];
-  Association[(# -> ollivierRicci[g, {idx[#[[1]]], idx[#[[2]]]}, dist]) & /@ ed]];
+  Association[(# -> ollivierRicci[g, {#[[1]], #[[2]]}, dist]) & /@ ed]];
+
+ollivierRicciMean[g0_Graph, nSamples_Integer: 200] := Module[
+   {g = IndexGraph[g0], dist, es, sample},
+   dist = GraphDistanceMatrix[g];
+   es = EdgeList[g];
+   sample = If[Length[es] <= nSamples, es, RandomSample[es, nSamples]];
+   Mean[(ollivierRicci[g, {#[[1]], #[[2]]}, dist] &) /@ sample]];
 
 (* ---- Forman-Ricci (triangle-augmented, unit weights) ------------------- *)
 formanRicci[g_Graph] := Module[{ed, tri, triCount},

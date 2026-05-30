@@ -34,11 +34,11 @@ If[FileExistsQ[graphFile],
   wm = ResourceFunction["WolframModel"];
   ev = wm[rule, init, gens];
   g = cliqueGraph[ev["FinalState"]];
-  g = Graph[g, VertexList[g] -> Range[VertexCount[g]]];   (* relabel 1..n *)
-  Export[graphFile, g];
   Export[plotFile, ev["FinalStatePlot", ImageSize -> 460]];
-  Print["  generated + cached: V=", VertexCount[g], " E=", EdgeCount[g]];
+  Print["  generated: V=", VertexCount[g], " E=", EdgeCount[g]];
 ];
+g = IndexGraph[g];               (* relabel vertices to 1..n (see graphgeometry.wl) *)
+Export[graphFile, g];            (* cache the clean, relabelled graph *)
 
 (* ---- emergent geometry of the hypergraph ------------------------------- *)
 res = GraphDDG`graphDimension[g, 7, 25];
@@ -46,8 +46,9 @@ Print["ball-growth |B_r| = ", res["counts"]];
 Print["  (super-polynomial growth \[Rule] tree-like, no finite dimension)"];
 orc = Values[GraphDDG`ollivierRicci[g]];
 Print["Ollivier-Ricci curvature: mean = ", fmt[Mean[orc]],
-  "   range = ", fmt /@ MinMax[orc]];
-Print["  \[RightArrow] negative: this rule grows a HYPERBOLIC emergent space,"];
+  "   median = ", fmt[Median[orc]], "   range = ", fmt /@ MinMax[orc]];
+Print["  \[RightArrow] negative on average, with strongly negative spikes at the"];
+Print["    high-degree hubs: a negatively-curved, tree-like emergent space,"];
 Print["    in contrast to the flat lattices and the d=2 mesh-graphs."];
 
 (* ---- render the graph coloured by Ollivier-Ricci ----------------------- *)

@@ -464,13 +464,39 @@ captionCell["Figure 7. A Wolfram-model hypergraph (the spatial graph of a \
 rewriting system)."],
 para[{"We can interrogate its geometry with the very same tools. Its geodesic \
 balls grow ", ital["faster"], " than any power of ", ital["r"],
-  " (no finite dimension), and its mean Ollivier-Ricci curvature is strongly \
-negative (\[TildeTilde]\[Minus]1.0): this rule grows a ", bold["hyperbolic"],
-  ", tree-like emergent space \[LongDash] the opposite of the flat lattices and \
-the two-dimensional mesh-graphs above."}],
+  " (no finite dimension), and its Ollivier-Ricci curvature is negative on \
+average (mean \[TildeTilde] \[Minus]0.13) with strongly negative spikes (to \
+\[Minus]1.5) at the high-degree hubs: this rule grows a ", bold["negatively \
+curved, tree-like"], " emergent space \[LongDash] the opposite of the flat \
+lattices and the two-dimensional mesh-graphs above."}],
 imgCell["wm_curvature.png", 520],
 captionCell["Figure 8. The Wolfram-model spatial graph coloured by Ollivier-Ricci \
-curvature (blue = negative): a hyperbolic emergent geometry."],
+curvature (blue = negative): a negatively curved, tree-like emergent geometry."],
+hd2["A gallery of networks"],
+para[{"The two probes \[LongDash] curvature \[Kappa] and dimension ", ital["d"],
+  " \[LongDash] are a general lens, so we turn them on a small zoo of networks. \
+Each is laid out, then placed in the ", ital["curvature-dimension plane"], ":"}],
+imgCell["network_gallery.png", 620],
+captionCell["Figure 9. A geometric zoo: periodic lattices, a random geometric \
+graph, a small-world (Watts\[Dash]Strogatz) and a scale-free (Barab\[AAcute]si\
+\[Dash]Albert) network, and a Wolfram-model hypergraph, each labelled with its \
+estimated dimension and mean Ollivier-Ricci curvature."],
+imgCell["network_plane.png", 580],
+captionCell["Figure 10. The curvature-dimension plane. The \[Kappa] = 0 line is \
+the robust classifier: lattices sit on it (Euclidean), the clustered random \
+geometric graph rises above it (positively curved), and the small-world, \
+scale-free and Wolfram-model networks fall below (negatively curved). Ball-growth \
+dimension is reliable for the regular lattices and only indicative for the \
+small-world and dense graphs, whose balls saturate too fast for a clean power law."],
+para[{"Two robust lessons survive the noise in ", ital["d"], ". First, ",
+  bold["curvature is the cleaner classifier"], ": it cleanly separates flat \
+(\[Kappa]=0), clustered/positively-curved, and hub-dominated/negatively-curved \
+networks. Second, the networks that look ", ital["geometric"],
+  " (lattices, the random geometric graph) are precisely those near \[Kappa]=0 \
+with an integer-ish dimension; ", ital["small-world"], " structure \[LongDash] \
+shortcuts, hubs \[LongDash] shows up as negative curvature and a runaway, \
+ill-defined dimension. This is exactly the diagnostic the search for a \
+physically realistic Wolfram-model rule needs."}],
 thmBox["The open problem.",
   {"Most simple rules give either 1-dimensional or exponentially-growing \
 (hyperbolic) space. Finding rules whose large-scale limit is flat and \
