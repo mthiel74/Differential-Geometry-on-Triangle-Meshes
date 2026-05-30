@@ -13,6 +13,7 @@ scripts = {
    FileNameJoin[{dir, "heat.wls"}],
    FileNameJoin[{dir, "hodge.wls"}],
    FileNameJoin[{dir, "convergence.wls"}],
+   FileNameJoin[{dir, "graphcurvature.wls"}],
    FileNameJoin[{dir, "yoda.wls"}],
    FileNameJoin[{root, "community", "build_notebook.wls"}]};
 
