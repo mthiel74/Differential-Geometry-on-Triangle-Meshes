@@ -252,12 +252,12 @@ eigenvectors are M-orthonormal to 10", e["\:207b\:00b9\:2075"],
 liveCell["sphere_mode", 360],
 rotNote,
 imgCell["eigenfunctions.png", 520],
-captionCell["Figure 1. The first nine non-constant eigenfunctions on a geodesic \
+captionCell["The first nine non-constant eigenfunctions on a geodesic \
 sphere \[LongDash] the discrete spherical harmonics for ", ital["l"], " = 1, 2, 3."],
 para[{"Because the eigenvectors are an orthonormal basis, truncating it low-pass \
 filters geometry exactly as a Fourier series filters a signal:"}],
 imgCell["spectral_smoothing.png", 620],
-captionCell["Figure 2. Spectral mesh smoothing: a bumpy sphere reconstructed from \
+captionCell["Spectral mesh smoothing: a bumpy sphere reconstructed from \
 its lowest ", ital["K"], " Laplacian eigenmodes \[LongDash] geometry's Fourier \
 compression."],
 
@@ -347,7 +347,7 @@ circulation a gradient or curl cannot produce \[LongDash] rotate it:"}],
 liveCell["hodge_harmonic", 440],
 rotNote,
 imgCell["hodge_decomposition.png", 640],
-captionCell["Figure 3. The full Hodge decomposition of the swirl: exact \
+captionCell["The full Hodge decomposition of the swirl: exact \
 (gradient, \[TildeTilde]0%), coexact (curl, 27%), harmonic (73%). The harmonic \
 component is the topological circulation around the hole."],
 
@@ -359,7 +359,7 @@ question is ", ital["how fast"], " the error falls as the mesh spacing ", ital["
   ital["C"], " ", ital["h"], e[SuperscriptBox["", "p"]],
   " by log-log least squares gives the empirical order ", ital["p"], ":"}],
 imgCell["convergence.png", 620],
-captionCell["Figure 4. Order of accuracy. Curvature is second order \
+captionCell["Order of accuracy. Curvature is second order \
 (", ital["p"], " \[TildeTilde] 2, on the slope-2 guide); the heat method is \
 sub-linear (", ital["p"], " \[TildeTilde] 0.6); and the Gauss\[Dash]Bonnet \
 residual sits at machine \[Epsilon] (\[TildeTilde]10", e["\:207b\:00b9\.b2"],
@@ -389,7 +389,7 @@ para[{"And mean curvature picks out the folds of the robe and the sharp creases 
 liveCell["yoda_H", 420],
 rotNote,
 imgCell["yoda_eigenfunctions.png", 560],
-captionCell["Figure 5. Laplace\[Dash]Beltrami eigenfunctions on the scan: the \
+captionCell["Laplace\[Dash]Beltrami eigenfunctions on the scan: the \
 slender staff carries a distinct low-frequency mode; spatial frequency rises \
 with the eigenvalue. The DDG operators degrade gracefully on messy, \
 boundary-carrying geometry \[LongDash] which is why they underpin real \
@@ -437,7 +437,7 @@ degree-induced negative bias \[LongDash] it reads a flat square grid as \
 \[Minus]2.9 where Ollivier correctly reads 0 \[LongDash] so it captures ",
   ital["relative"], " curvature, not the absolute geometric value:"}],
 imgCell["forman_vs_ollivier.png", 620],
-captionCell["Figure 6. Forman-Ricci vs Ollivier-Ricci, edge by edge. The cheap, \
+captionCell["Forman-Ricci vs Ollivier-Ricci, edge by edge. The cheap, \
 degree-based Forman curvature correlates strongly with the transport-based \
 Ollivier curvature \[LongDash] a fast proxy \[LongDash] though offset by the \
 degree term."],
@@ -465,8 +465,31 @@ characteristic finite-size underestimate from the discrete ball corrections), \
 and our sphere and torus mesh-graphs both come out two-dimensional \[LongDash] \
 read purely from their connectivity, with no coordinates at all:"}],
 imgCell["graph_dimension.png", 600],
-captionCell["Figure 7. Emergent dimension from ball growth. The log-log slopes \
+captionCell["Emergent dimension from ball growth. The log-log slopes \
 separate 1D (ring), 2D (2-torus and both mesh-graphs) and 3D (3-torus)."],
+
+hd2["Curvature-guided coarsening"],
+para[{"Because Forman-Ricci is so cheap, it can ", ital["drive"],
+  " a computation, not just describe one. A discrete analogue of Ricci flow \
+\[LongDash] which contracts regions of high curvature \[LongDash] is to \
+repeatedly merge the edge of maximal Forman curvature (the most clustered, \
+redundant edge). This ", bold["coarse-grains"], " the graph while preserving \
+its large-scale shape. Two consequences are worth seeing. First, coarsening a \
+2D mesh-graph leaves its emergent dimension essentially unchanged \[LongDash] \
+", ital["dimension is scale-invariant"], ", the renormalization-group \
+signature of a genuine geometry:"}],
+imgCell["coarsen_dimension.png", 460],
+captionCell["A 2D mesh-graph coarsened from ~1000 to ~500 vertices keeps \
+dimension d \[TildeTilde] 1.8; only when the graph becomes too small to fit a \
+power law does the estimate dip."],
+para[{"Second, on a graph with planted communities the dense (high-curvature) \
+intra-community edges collapse first, so the same coarsening merges each \
+community into a super-vertex and recovers the network's modular skeleton \
+(here at \[TildeTilde] 82% purity):"}],
+imgCell["coarsen_communities.png", 660],
+captionCell["Forman-guided coarsening as community detection: 180 vertices in \
+four planted communities (left) collapse to a handful of super-vertices coloured \
+by their dominant community (right; size = number of members absorbed)."],
 
 (* ====================== 10. Wolfram Physics ====================== *)
 hd1["10.  A Wolfram-Physics bridge: emergent geometry of a hypergraph"],
@@ -478,7 +501,7 @@ structure of such a graph. Here is one hypergraph after a few generations of the
 rule ", e[ToBoxes[TraditionalForm[HoldForm[{{1, 2, 3}} ->
      {{1, 2, 4}, {4, 3, 5}, {5, 2, 1}}]]]], ":"}],
 imgCell["wm_hypergraph.png", 380],
-captionCell["Figure 8. A Wolfram-model hypergraph (the spatial graph of a \
+captionCell["A Wolfram-model hypergraph (the spatial graph of a \
 rewriting system)."],
 para[{"We can interrogate its geometry with the very same tools. Its geodesic \
 balls grow ", ital["faster"], " than any power of ", ital["r"],
@@ -488,19 +511,19 @@ average (mean \[TildeTilde] \[Minus]0.13) with strongly negative spikes (to \
 curved, tree-like"], " emergent space \[LongDash] the opposite of the flat \
 lattices and the two-dimensional mesh-graphs above."}],
 imgCell["wm_curvature.png", 520],
-captionCell["Figure 9. The Wolfram-model spatial graph coloured by Ollivier-Ricci \
+captionCell["The Wolfram-model spatial graph coloured by Ollivier-Ricci \
 curvature (blue = negative): a negatively curved, tree-like emergent geometry."],
 hd2["A gallery of networks"],
 para[{"The two probes \[LongDash] curvature \[Kappa] and dimension ", ital["d"],
   " \[LongDash] are a general lens, so we turn them on a small zoo of networks. \
 Each is laid out, then placed in the ", ital["curvature-dimension plane"], ":"}],
 imgCell["network_gallery.png", 620],
-captionCell["Figure 10. A geometric zoo: periodic lattices, a random geometric \
+captionCell["A geometric zoo: periodic lattices, a random geometric \
 graph, a small-world (Watts\[Dash]Strogatz) and a scale-free (Barab\[AAcute]si\
 \[Dash]Albert) network, and a Wolfram-model hypergraph, each labelled with its \
 estimated dimension and mean Ollivier-Ricci curvature."],
 imgCell["network_plane.png", 580],
-captionCell["Figure 11. The curvature-dimension plane. The \[Kappa] = 0 line is \
+captionCell["The curvature-dimension plane. The \[Kappa] = 0 line is \
 the robust classifier: lattices sit on it (Euclidean), the clustered random \
 geometric graph rises above it (positively curved), and the small-world, \
 scale-free and Wolfram-model networks fall below (negatively curved). Ball-growth \
@@ -522,16 +545,25 @@ how their vertex count grows with each generation \[LongDash] ", ital["V"], "(",
   " marks a ", ital["d"], "-dimensional space, while ", ital["V"], " ~ ",
   ital["c"], e[SuperscriptBox["", "g"]], " marks an exponentially-growing \
 (hyperbolic) one \[LongDash] then measure the ball-growth dimension and \
-Ollivier-Ricci of the survivors. Across twenty rules the result is a stark ",
-  bold["\"missing middle\""], ": eleven grow exponentially, the rest are \
-one-dimensional or trivial, and ", bold["not one"], " lands in the flat, \
-finite-dimensional 2D/3D band."}],
-imgCell["wm_rule_search.png", 660],
-captionCell["Figure 12. A 20-rule search. Left: the emergent geometry is either \
-~1D or exponential \[LongDash] the flat 2D/3D regime is empty. Right: a 1D rule \
-and an exponential rule bracket, but never occupy, the ", ital["g"],
-  StyleBox["\.b2", FontSize -> 9], "/", ital["g"], StyleBox["\.b3", FontSize -> 9],
-  " growth a 2D/3D space would show."],
+Ollivier-Ricci of the survivors. The result is a stark ",
+  bold["\"missing middle\""], ": a 1D rule and an exponential rule bracket, but \
+never occupy, the ", ital["g"], StyleBox["\.b2", FontSize -> 9], "/", ital["g"],
+  StyleBox["\.b3", FontSize -> 9], " growth that a 2D or 3D space would show."}],
+imgCell["wm_rule_search.png", 620],
+captionCell["A first 20-rule screen: emergent geometry is either ~1D or \
+exponential; the flat 2D/3D regime is empty. A 1D rule and an exponential rule \
+bracket the ", ital["g"], StyleBox["\.b2", FontSize -> 9], "/", ital["g"],
+  StyleBox["\.b3", FontSize -> 9], " growth a 2D/3D space would need."],
+para[{"Scaling up to ", bold["160 rules"], ", and replacing the crude growth \
+exponent with a proper exponential-vs-power-law fit (a two-point exponent \
+cannot tell an exponential of small base from a genuine power law), sharpens \
+the picture: ", bold["103"], " grow exponentially, 31 are trivial, 19 are ~1D, \
+just ", bold["5"], " are ~2D and ", bold["none"], " ~3D \[LongDash] only two of \
+the 160 land anywhere in the flat 2D/3D band."}],
+imgCell["wm_rule_distribution.png", 660],
+captionCell["The census over 160 rules. Left: the finite-dimensional rules \
+cluster at ", ital["d"], " \[TildeTilde] 1; the flat 2D/3D band is nearly empty. \
+Right: exponential (hyperbolic) growth is overwhelmingly the norm."],
 thmBox["The open problem.",
   {"Most simple rules give either 1-dimensional or exponentially-growing \
 (hyperbolic) space. Finding rules whose large-scale limit is flat and \
@@ -558,7 +590,8 @@ tableCell[Grid[{
    {"emergent dimension", "periodic lattices", "1, 2, 3 recovered"},
    {"soccer-ball theorem", "sphere degree-5 defects", "exactly 12"},
    {"Forman vs Ollivier", "per-edge correlation", "r = 0.6 \[Dash] 0.9"},
-   {"rule search", "flat 2D/3D rule in 20", "none found"}},
+   {"rule search", "flat 2D/3D rules in 160", "only 2"},
+   {"Ricci coarsening", "dimension preserved", "~1.8 over 2\[Times] coarsening"}},
   Frame -> All, FrameStyle -> GrayLevel[0.8], Spacings -> {2, 1.1},
   Background -> {None, {RGBColor[0.93, 0.95, 0.99], None}}, Alignment -> Left]],
 
@@ -609,7 +642,9 @@ wolframscript -file wolfram/graphcurvature.wls # \[Section]9  graph curvature + 
 wolframscript -file wolfram/wolframmodel.wls  # \[Section]10 Wolfram-model hypergraph
 wolframscript -file wolfram/networkgallery.wls # \[Section]10 network gallery
 wolframscript -file wolfram/forman.wls        # \[Section]9  Forman vs Ollivier
-# scripts/search_wolframmodel.wls  -- one-off rule search (needs internet)
+wolframscript -file wolfram/coarsen.wls       # \[Section]9  curvature-guided coarsening
+# scripts/search_wolframmodel.wls, scripts/enumerate_wolframmodel.wls
+#   -- one-off Wolfram-model rule searches (need internet)
 wolframscript -file wolfram/models.wls        # live rotatable models
 wolframscript -file community/build_notebook.wls   # this notebook
 # wolfram/run_all.wls runs the whole pipeline end to end."],
