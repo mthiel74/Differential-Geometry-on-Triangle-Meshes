@@ -1,5 +1,17 @@
 # Differential Geometry on Triangle Meshes
 
+![One operator — the cotangent Laplacian — is all of this: the same torus rendered by its Gaussian curvature, its Laplace–Beltrami eigenmodes, mean-curvature flow, and heat-method geodesic distance.](docs/images/hero/hero.gif)
+
+> ### The point, in one sentence
+> A triangle mesh is *just* a list of points and triangles. It has **no**
+> curvature, **no** spectrum, **no** notion of distance, **no** topology —
+> none of differential geometry — until you build it. The surprise of
+> discrete differential geometry is that you don't need a different tool for
+> each: **one sparse matrix, the cotangent Laplacian, manufactures all of
+> them.** The animation above is that claim made literal — the *same* torus,
+> seen four ways through that one operator: its **curvature**, its
+> **vibration modes**, **curvature flow**, and **geodesic distance**.
+
 A from-scratch, reproducible exploration of **discrete differential
 geometry (DDG)** — how the smooth notions of curvature, normals, the
 Laplace–Beltrami operator and curvature flow are defined on, and
@@ -72,8 +84,8 @@ wolframscript -file wolfram/hodge.wls
 # §7 Convergence / order-of-accuracy study (curvature O(h²), geodesics, Gauss–Bonnet)
 wolframscript -file wolfram/convergence.wls
 
-# §8 The operators on a real 3D scan (decimated Yoda figurine)
-wolframscript -file wolfram/yoda.wls
+# §8 The operators on a real 3D scan (decimated T. rex skull, CC0)
+wolframscript -file wolfram/trex.wls
 
 # §9 Discrete curvature + emergent dimension on graphs (Ollivier–Ricci, ball growth)
 wolframscript -file wolfram/graphcurvature.wls
@@ -123,9 +135,10 @@ Figures land in `docs/images/`. The narrative arc — the
 is **curvature → Laplace–Beltrami → spectrum → curvature flow →
 heat-method geodesics → DEC / Hodge decomposition**, all implemented and
 each validated against a smooth reference or a topological invariant.
-The same operators are then run on a **3D-scanned Yoda** figurine
-(decimated via `scripts/prepare_yoda.py`) to show they work on real,
-messy geometry.
+The same operators are then run on a **3D-scanned *Tyrannosaurus rex*
+skull** (a museum cast, released **CC0** by Emily Hauf / Digital Atlas of
+Ancient Life; decimated via `scripts/prepare_trex.py`) to show they work on
+real, messy geometry — see [`data/CREDITS.md`](data/CREDITS.md) for provenance.
 
 ### A note on test meshes
 
@@ -147,3 +160,11 @@ post once the DDG notions and figures are in place.
 
 * [ENSO-emergence](https://github.com/mthiel74/ENSO-emergence)
 * [Contiguous-Cartograms](https://github.com/mthiel74/Contiguous-Cartograms)
+
+## License
+
+Source code, scripts and prose are released under the **MIT License** (see
+[`LICENSE`](LICENSE)). Bundled data assets may carry their own terms, recorded
+in [`data/CREDITS.md`](data/CREDITS.md); in particular the *Tyrannosaurus rex*
+skull scan (`data/trex*.obj`) is third-party content released under **CC0 1.0**
+(public domain) by Emily Hauf / Digital Atlas of Ancient Life.

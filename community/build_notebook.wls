@@ -16,6 +16,7 @@
 repoRoot = ParentDirectory@DirectoryName[$InputFileName];
 imgDir   = FileNameJoin[{repoRoot, "docs", "images"}];
 modelDir = FileNameJoin[{repoRoot, "docs", "models"}];
+codeDir  = FileNameJoin[{repoRoot, "community", "code"}];
 outNb    = FileNameJoin[{repoRoot, "community", "ddg.nb"}];
 outPdf   = FileNameJoin[{repoRoot, "community", "ddg.pdf"}];
 
@@ -50,6 +51,15 @@ wlIn[code_String] := Cell[code, "Input", CellMargins -> {{60, 30}, {6, 6}}, Font
 codeIn[code_String] := Cell[code, "Program", CellMargins -> {{60, 30}, {6, 6}},
    FontFamily -> "Courier", FontSize -> 11, ShowStringCharacters -> False,
    Background -> RGBColor[0.95, 0.96, 0.98]];
+
+(* shown[name]: embed community/code/<name>.wl verbatim as an Input cell — the
+   exact code (with all arguments) that produced the figure that follows. The
+   figure itself is the committed PNG/WXF, so the build stays fast and offline. *)
+shown[name_String] := With[{p = FileNameJoin[{codeDir, name <> ".wl"}]},
+   If[FileExistsQ[p],
+     wlIn[StringTrim[Import[p, "Text"]]],
+     Cell[TextData[{bold["[ missing code snippet: " <> name <> " ]"]}], "Text",
+       FontColor -> RGBColor[0.7, 0.1, 0.1]]]];
 
 imgCell[file_, width_: 580] := With[{p = FileNameJoin[{imgDir, file}]},
    If[FileExistsQ[p],
@@ -96,6 +106,29 @@ tableCell[grid_] := Cell[BoxData[ToBoxes[grid]], "Output", ShowCellLabel -> Fals
 rotNote := captionCell[bold["This is a live 3D object \[LongDash] click and drag to rotate it."]];
 e[s_] := Cell[BoxData[s], "InlineFormula"];   (* inline box fragment *)
 
+(* ---- stylesheet -------------------------------------------------------- *)
+(* The Wolfram Community look: Roboto Condensed headers in teal-blue, built
+   on top of Default.nb. The blue is RGBColor[0.153, 0.51, 0.64]. Roboto
+   Condensed falls back gracefully to the default sans if not installed; the
+   colour (the requested "blue section titles") is font-independent. *)
+ddgBlue = RGBColor[0.153, 0.51, 0.64];
+ddgStyleSheet = Notebook[{
+   Cell[StyleData[StyleDefinitions -> "Default.nb"]],
+   Cell[StyleData["Title"], FontFamily -> "Roboto Condensed",
+     FontColor -> ddgBlue],
+   Cell[StyleData["Subtitle"], FontFamily -> "Roboto Condensed", FontSize -> 17,
+     FontColor -> GrayLevel[0.4]],
+   Cell[StyleData["Section"], FontFamily -> "Roboto Condensed", FontSize -> 30,
+     FontColor -> ddgBlue],
+   Cell[StyleData["Subsection"], FontFamily -> "Roboto Condensed",
+     FontColor -> ddgBlue],
+   Cell[StyleData["Subsubsection"], FontFamily -> "Roboto Condensed"],
+   Cell[StyleData["Input"], StyleHints -> <|"CodeFont" -> "Source Sans Pro"|>,
+     FontSize -> 14],
+   Cell[StyleData["Output"], StyleHints -> <|"CodeFont" -> "Source Sans Pro"|>,
+     FontSize -> 14]
+ }];
+
 (* ===================================================================== *)
 
 cells = Flatten[{
@@ -103,6 +136,17 @@ cells = Flatten[{
 title["Differential Geometry on Triangle Meshes"],
 subtitle["One operator \[LongDash] the cotangent Laplacian \[LongDash] from \
 curvature to spectra, flow, geodesics and topology, in Wolfram Language"],
+
+animCell["hero/hero.gif", 640],
+captionCell["The whole notebook in one image. A triangle mesh has no \
+curvature, no spectrum, no notion of distance \[LongDash] none of differential \
+geometry \[LongDash] until you build it. The surprise is that a ",
+   bold["single sparse matrix, the cotangent Laplacian"],
+   ", manufactures all of it. Here is the ", ital["same"],
+   " torus seen four ways through that one operator: its Gaussian ",
+   bold["curvature"], ", its Laplace\[Dash]Beltrami ", bold["vibration modes"],
+   ", mean-curvature ", bold["flow"], ", and heat-method ",
+   bold["geodesic distance"], "."],
 
 abstract[{bold["Abstract. "],
   "A smooth surface carries curvature, a Laplace operator, a spectrum, a notion \
@@ -122,6 +166,19 @@ it down \[LongDash] including the measured ", ital["order of accuracy"],
 finally pushed beyond meshes to ", bold["graphs"], " \[LongDash] Ollivier-Ricci \
 curvature and emergent dimension \[LongDash] bridging to the discrete geometry of \
 the ", bold["Wolfram Physics Project"], "."}],
+
+(* ====================== Setup =================================== *)
+hd1["Setup: the two accompanying packages"],
+para[{"Every operator used below lives in one of two small, plain-text Wolfram \
+packages committed alongside this notebook: ", mono["wolfram/ddg.wl"],
+  " (mesh operators \[LongDash] curvature, the cotangent Laplacian, spectra, \
+mean-curvature flow, heat-method geodesics, DEC) and ", mono["wolfram/graphgeometry.wl"],
+  " (graph curvature and emergent dimension). Load them once at the top; \
+thereafter ", bold["every figure is preceded by the exact code \[LongDash] with \
+all arguments \[LongDash] that produced it"], ". The displayed figures are the \
+committed high-resolution renders, so reading the notebook needs no evaluation; \
+re-running the code cells regenerates them."}],
+shown["setup"],
 
 (* ====================== 0. Discrete world ======================== *)
 hd1["0.  The discrete world: meshes and a dictionary"],
@@ -150,6 +207,7 @@ by construction. Structure-preservation, not merely small truncation error, is \
 what keeps the theorems exact. Two closed-form test surfaces \[LongDash] a ",
   bold["torus"], " and a geodesic ", bold["sphere"], " (a subdivided \
 icosahedron) \[LongDash] let us check every answer."}],
+shown["s0_meshes"],
 
 (* ====================== 1. Curvature ============================= *)
 hd1["1.  Curvature: the shape operator, angle defect, Gauss\[Dash]Bonnet"],
@@ -183,6 +241,7 @@ positions: the ", ital["mean-curvature normal"], " satisfies \[CapitalDelta]",
 the torus is coloured by ", ital["K"], " (left) and ", ital["H"], " (right) \
 \[LongDash] both are live, so rotate them to see the warm positive-curvature \
 outer rim and the cool inner rim:"}],
+shown["s1_curvature"],
 liveRow[{"torus_K", "torus_H"}, 300],
 rotNote,
 para[{"Quantitatively the discrete ", ital["K"], " matches the analytic torus \
@@ -212,10 +271,7 @@ make it the right operator, all holding by construction: it is ", bold["symmetri
   bold["mass matrix"], " ", ital["M"], " of vertex areas, ", ital["M"], e["\:207b\.b9"],
   ital["L"], " is the discrete \[CapitalDelta]. Every later section is this one \
 matrix with a different right-hand side."}],
-wlIn["L = DDG`cotanLaplacian[mesh];          (* V\[Times]V SparseArray *)
-Max[Abs[L - Transpose[L]]]                 (* 0  : symmetric *)
-Max[Abs[L . ConstantArray[1., Length[L]]]] (* ~1e-15 : constants in kernel *)
-M = DDG`massMatrix[mesh];                   (* diagonal vertex areas *)"],
+shown["s2_laplacian"],
 para[{"In \[Section]6 the very same matrix re-emerges from discrete exterior \
 calculus as ", ital["L"], " = ", e[SubscriptBox["d", "0"]], e["\[Transpose]"], " ",
   e[SubscriptBox["\[Star]", "1"]], " ", e[SubscriptBox["d", "0"]],
@@ -249,13 +305,16 @@ grows like the area: ", e[ToBoxes[TraditionalForm[HoldForm[\[ScriptCapitalN][\[L
   ital["Shape-DNA"], " fingerprint (Reuter et al. 2006). The discrete \
 eigenvectors are M-orthonormal to 10", e["\:207b\:00b9\:2075"],
   " and, on the sphere, are literally the spherical harmonics. Rotate one:"}],
+shown["s3_eigenmode"],
 liveCell["sphere_mode", 360],
 rotNote,
+shown["s3_eigenfunctions"],
 imgCell["eigenfunctions.png", 520],
 captionCell["The first nine non-constant eigenfunctions on a geodesic \
 sphere \[LongDash] the discrete spherical harmonics for ", ital["l"], " = 1, 2, 3."],
 para[{"Because the eigenvectors are an orthonormal basis, truncating it low-pass \
 filters geometry exactly as a Fourier series filters a signal:"}],
+shown["s3_smoothing"],
 imgCell["spectral_smoothing.png", 620],
 captionCell["Spectral mesh smoothing: a bumpy sphere reconstructed from \
 its lowest ", ital["K"], " Laplacian eigenmodes \[LongDash] geometry's Fourier \
@@ -283,8 +342,10 @@ para[{"A clean quantitative test: a round sphere stays round with ", ital["d"],
 \[Minus]3.98. Applied to a bumpy sphere and rescaled to constant volume (so the \
 eye sees smoothing, not the shrinking bare flow also produces), the surface \
 relaxes to round while its curvature equalises. Rotate the before/after pair:"}],
+shown["s4_flow_pair"],
 liveRow[{"mcf_bumpy", "mcf_faired"}, 290],
 rotNote,
+shown["s4_flow_anim"],
 animCell["mcf_flow.gif"],
 captionCell["Animation. The flow over time; the mean-curvature heat-map settles \
 to uniform as the shape rounds."],
@@ -310,6 +371,7 @@ collide is the ", bold["cut locus"], " (the antipode on a sphere, a richer set \
 on the torus) \[LongDash] the points reachable by more than one shortest path, \
 where the distance is non-smooth. Rotate the fields and follow a band around the \
 torus' hole:"}],
+shown["s5_geodesics"],
 liveRow[{"geo_sphere", "geo_torus"}, 300],
 rotNote,
 
@@ -344,8 +406,11 @@ para[{"Computed as ", e[SubscriptBox["b", "1"]], " = E \[Minus] rank ",
 sphere. The torus' two generators circulate around its two cycles (the meridian \
 and the longitude). Decomposing a swirl, the harmonic part is the dominant \
 circulation a gradient or curl cannot produce \[LongDash] rotate it:"}],
+shown["s6_dec"],
+shown["s6_harmonic"],
 liveCell["hodge_harmonic", 440],
 rotNote,
+shown["s6_decomposition"],
 imgCell["hodge_decomposition.png", 640],
 captionCell["The full Hodge decomposition of the swirl: exact \
 (gradient, \[TildeTilde]0%), coexact (curl, 27%), harmonic (73%). The harmonic \
@@ -358,6 +423,7 @@ question is ", ital["how fast"], " the error falls as the mesh spacing ", ital["
   " shrinks. Refining our test surfaces and fitting ", ital["error"], " ~ ",
   ital["C"], " ", ital["h"], e[SuperscriptBox["", "p"]],
   " by log-log least squares gives the empirical order ", ital["p"], ":"}],
+shown["s7_convergence"],
 imgCell["convergence.png", 620],
 captionCell["Order of accuracy. Curvature is second order \
 (", ital["p"], " \[TildeTilde] 2, on the slope-2 guide); the heat method is \
@@ -375,25 +441,31 @@ demands it, convergent where a number is estimated."}],
 (* ====================== 8. Real scan ============================= *)
 hd1["8.  The operators on a real 3D scan"],
 para[{"Spheres and tori let us check answers; real geometry shows the operators \
-are not toys. We take a 503k-vertex scanned ", bold["Yoda"], " figurine (from the \
-Wolfram3DObjects collection), weld its texture seams, keep the largest component, \
-and quadric-decimate it to a clean 12k-triangle mesh (a one-off ", mono["open3d"],
-  " step; the result is committed, so the analysis stays pure Wolfram Language). \
-Every operator runs on it unchanged. Rotate the geodesic field \[LongDash] note \
-the distance creeping ", ital["along"], " the staff, reaching the tip only after \
-travelling down the arm, exactly as an ant on the surface would:"}],
-liveCell["yoda_geo", 420],
+are not toys. We take a 332k-vertex photogrammetric scan of a ", bold[
+  "Tyrannosaurus rex skull"], " (a museum cast, released ", bold["CC0"],
+  " by Emily Hauf / Digital Atlas of Ancient Life), weld its duplicate vertices, \
+keep the largest component, and quadric-decimate it to a clean 12k-triangle mesh \
+(a one-off ", mono["open3d"], " step; the result is committed, so the analysis \
+stays pure Wolfram Language). Every operator runs on it unchanged. Rotate the \
+geodesic field \[LongDash] note the distance creeping back from the snout, \
+reaching the back of the cranium only after travelling along the jaws and around \
+the skull's openings, exactly as an ant on the surface would:"}],
+shown["s8_trex_geo"],
+liveCell["trex_geo", 420],
 rotNote,
-para[{"And mean curvature picks out the folds of the robe and the sharp creases \
-(a robust quantile clip suppresses scan noise):"}],
-liveCell["yoda_H", 420],
+para[{"And mean curvature picks out the teeth, the rims of the eye sockets and \
+the skull fenestrae, and the bone sutures (a robust quantile clip suppresses scan \
+noise):"}],
+shown["s8_trex_H"],
+liveCell["trex_H", 420],
 rotNote,
-imgCell["yoda_eigenfunctions.png", 560],
+shown["s8_trex_eigen"],
+imgCell["trex_eigenfunctions.png", 560],
 captionCell["Laplace\[Dash]Beltrami eigenfunctions on the scan: the \
-slender staff carries a distinct low-frequency mode; spatial frequency rises \
+elongated snout carries a distinct low-frequency mode; spatial frequency rises \
 with the eigenvalue. The DDG operators degrade gracefully on messy, \
-boundary-carrying geometry \[LongDash] which is why they underpin real \
-geometry-processing software."],
+boundary-carrying geometry \[LongDash] the skull's fenestrae are real boundaries \
+\[LongDash] which is why they underpin real geometry-processing software."],
 
 (* ====================== 9. Graphs ================================ *)
 hd1["9.  From meshes to networks: discrete curvature on graphs"],
@@ -415,6 +487,7 @@ curvature's own: if neighbourhoods are ", ital["closer"], " than their centres \
   " (as at a tree's branch points) it is negative; flat if equal. We solve the \
 transport as a small linear program. The signs come out exactly as geometry \
 predicts:"}],
+shown["s9_ollivier_table"],
 tableCell[Grid[{
    {Style["graph", Bold], Style["mean Ollivier-Ricci", Bold], Style["geometry", Bold]},
    {"complete K\:2086", "+0.80", "very positively curved"},
@@ -436,6 +509,7 @@ an excellent fast screen for curvature hot-spots; but it carries a \
 degree-induced negative bias \[LongDash] it reads a flat square grid as \
 \[Minus]2.9 where Ollivier correctly reads 0 \[LongDash] so it captures ",
   ital["relative"], " curvature, not the absolute geometric value:"}],
+shown["s9_forman"],
 imgCell["forman_vs_ollivier.png", 620],
 captionCell["Forman-Ricci vs Ollivier-Ricci, edge by edge. The cheap, \
 degree-based Forman curvature correlates strongly with the transport-based \
@@ -448,6 +522,7 @@ formula forbids tiling a sphere with hexagons alone. Exactly ", bold["twelve"],
 positive Ollivier-Ricci curvature concentrates: the ", ital["soccer-ball \
 theorem"], ", a combinatorial face of Gauss\[Dash]Bonnet (\[Chi] = 2). Rotate the \
 sphere to find its twelve defects:"}],
+shown["s9_soccer"],
 liveCell["soccer", 400],
 rotNote,
 para[{"The structured torus, by contrast, is a ", ital["perfect"],
@@ -464,6 +539,7 @@ para[{"recovers the dimension. On periodic lattices it returns 1, 2, 3 (with a \
 characteristic finite-size underestimate from the discrete ball corrections), \
 and our sphere and torus mesh-graphs both come out two-dimensional \[LongDash] \
 read purely from their connectivity, with no coordinates at all:"}],
+shown["s9_dimension"],
 imgCell["graph_dimension.png", 600],
 captionCell["Emergent dimension from ball growth. The log-log slopes \
 separate 1D (ring), 2D (2-torus and both mesh-graphs) and 3D (3-torus)."],
@@ -478,6 +554,7 @@ its large-scale shape. Two consequences are worth seeing. First, coarsening a \
 2D mesh-graph leaves its emergent dimension essentially unchanged \[LongDash] \
 ", ital["dimension is scale-invariant"], ", the renormalization-group \
 signature of a genuine geometry:"}],
+shown["s9_coarsen_dim"],
 imgCell["coarsen_dimension.png", 460],
 captionCell["A 2D mesh-graph coarsened from ~1000 to ~500 vertices keeps \
 dimension d \[TildeTilde] 1.8; only when the graph becomes too small to fit a \
@@ -486,6 +563,7 @@ para[{"Second, on a graph with planted communities the dense (high-curvature) \
 intra-community edges collapse first, so the same coarsening merges each \
 community into a super-vertex and recovers the network's modular skeleton \
 (here at \[TildeTilde] 82% purity):"}],
+shown["s9_coarsen_comm"],
 imgCell["coarsen_communities.png", 660],
 captionCell["Forman-guided coarsening as community detection: 180 vertices in \
 four planted communities (left) collapse to a handful of super-vertices coloured \
@@ -500,6 +578,7 @@ three-dimensional, gently curved \[LongDash] emerges from the large-scale \
 structure of such a graph. Here is one hypergraph after a few generations of the \
 rule ", e[ToBoxes[TraditionalForm[HoldForm[{{1, 2, 3}} ->
      {{1, 2, 4}, {4, 3, 5}, {5, 2, 1}}]]]], ":"}],
+shown["s10_wm_hypergraph"],
 imgCell["wm_hypergraph.png", 380],
 captionCell["A Wolfram-model hypergraph (the spatial graph of a \
 rewriting system)."],
@@ -510,6 +589,7 @@ average (mean \[TildeTilde] \[Minus]0.13) with strongly negative spikes (to \
 \[Minus]1.5) at the high-degree hubs: this rule grows a ", bold["negatively \
 curved, tree-like"], " emergent space \[LongDash] the opposite of the flat \
 lattices and the two-dimensional mesh-graphs above."}],
+shown["s10_wm_curvature"],
 imgCell["wm_curvature.png", 520],
 captionCell["The Wolfram-model spatial graph coloured by Ollivier-Ricci \
 curvature (blue = negative): a negatively curved, tree-like emergent geometry."],
@@ -517,11 +597,13 @@ hd2["A gallery of networks"],
 para[{"The two probes \[LongDash] curvature \[Kappa] and dimension ", ital["d"],
   " \[LongDash] are a general lens, so we turn them on a small zoo of networks. \
 Each is laid out, then placed in the ", ital["curvature-dimension plane"], ":"}],
+shown["s10_gallery"],
 imgCell["network_gallery.png", 620],
 captionCell["A geometric zoo: periodic lattices, a random geometric \
 graph, a small-world (Watts\[Dash]Strogatz) and a scale-free (Barab\[AAcute]si\
 \[Dash]Albert) network, and a Wolfram-model hypergraph, each labelled with its \
 estimated dimension and mean Ollivier-Ricci curvature."],
+shown["s10_plane"],
 imgCell["network_plane.png", 580],
 captionCell["The curvature-dimension plane. The \[Kappa] = 0 line is \
 the robust classifier: lattices sit on it (Euclidean), the clustered random \
@@ -549,6 +631,7 @@ Ollivier-Ricci of the survivors. The result is a stark ",
   bold["\"missing middle\""], ": a 1D rule and an exponential rule bracket, but \
 never occupy, the ", ital["g"], StyleBox["\.b2", FontSize -> 9], "/", ital["g"],
   StyleBox["\.b3", FontSize -> 9], " growth that a 2D or 3D space would show."}],
+shown["s10_rule_search"],
 imgCell["wm_rule_search.png", 620],
 captionCell["A first 20-rule screen: emergent geometry is either ~1D or \
 exponential; the flat 2D/3D regime is empty. A 1D rule and an exponential rule \
@@ -560,6 +643,7 @@ cannot tell an exponential of small base from a genuine power law), sharpens \
 the picture: ", bold["103"], " grow exponentially, 31 are trivial, 19 are ~1D, \
 just ", bold["5"], " are ~2D and ", bold["none"], " ~3D \[LongDash] only two of \
 the 160 land anywhere in the flat 2D/3D band."}],
+shown["s10_rule_distribution"],
 imgCell["wm_rule_distribution.png", 660],
 captionCell["The census over 160 rules. Left: the finite-dimensional rules \
 cluster at ", ital["d"], " \[TildeTilde] 1; the flat 2D/3D band is nearly empty. \
@@ -624,12 +708,19 @@ Physics."], " Wolfram Media. ", link["wolframphysics.org", "https://www.wolframp
 
 (* ====================== 13. Reproducibility ====================== *)
 hd1["13.  Reproducibility"],
-para[{"All code is pure Wolfram Language. The package ", mono["wolfram/ddg.wl"],
+para[{"All code is pure Wolfram Language, and the code behind every figure is \
+shown inline above it. The two packages ", mono["wolfram/ddg.wl"], " and ",
+  mono["wolfram/graphgeometry.wl"], " (loaded in the Setup cell) hold the \
+operators; each section then shows the full calls \[LongDash] with all arguments \
+\[LongDash] that produced its figures. The package ", mono["wolfram/ddg.wl"],
   " defines the mesh accessors, test meshes and operators; each section's \
 figures come from one standalone script, and every operator has a sanity check \
 in ", mono["tests/"], " (all exit 0). ", mono["wolfram/models.wls"],
   " exports the live Graphics3D in this notebook; the one non-WL step is a \
-one-off ", mono["open3d"], " decimation of the Yoda scan."}],
+one-off ", mono["open3d"], " decimation of the T. rex skull scan. That scan is \
+a museum cast digitised by Emily Hauf for the Digital Atlas of Ancient Life \
+(Paleontological Research Institution) and released into the public domain (",
+  bold["CC0"], "); see ", mono["data/CREDITS.md"], "."}],
 codeIn["wolframscript -file wolfram/curvature.wls     # \[Section]1  Gaussian curvature
 wolframscript -file wolfram/meancurvature.wls # \[Section]1-2 mean curvature
 wolframscript -file wolfram/spectral.wls      # \[Section]3  spectrum + harmonics
@@ -637,7 +728,7 @@ wolframscript -file wolfram/meanflow.wls      # \[Section]4  mean-curvature flow
 wolframscript -file wolfram/heat.wls          # \[Section]5  heat-method geodesics
 wolframscript -file wolfram/hodge.wls         # \[Section]6  DEC + Hodge
 wolframscript -file wolfram/convergence.wls   # \[Section]7  order of accuracy
-wolframscript -file wolfram/yoda.wls          # \[Section]8  the 3D scan
+wolframscript -file wolfram/trex.wls          # \[Section]8  the 3D scan
 wolframscript -file wolfram/graphcurvature.wls # \[Section]9  graph curvature + dimension
 wolframscript -file wolfram/wolframmodel.wls  # \[Section]10 Wolfram-model hypergraph
 wolframscript -file wolfram/networkgallery.wls # \[Section]10 network gallery
@@ -658,8 +749,8 @@ Print["assembled ", Length[cells], " cells"];
 
 TimeConstrained[
   UsingFrontEnd[
-    nbObj = CreateDocument[cells, Visible -> False, WindowSize -> {1000, 800},
-      StyleDefinitions -> "Default.nb"];
+    nbObj = CreateDocument[cells, Visible -> False, WindowSize -> {1000, 800}];
+    SetOptions[nbObj, StyleDefinitions -> ddgStyleSheet];
     NotebookSave[nbObj, outNb];
     Print["wrote ", outNb, " (", FileByteCount[outNb], " B)"];
     Quiet@Check[

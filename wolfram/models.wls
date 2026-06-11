@@ -79,16 +79,19 @@ hg = Graphics3D[{
    PlotLabel -> "harmonic field \[Gamma] (circulates the handle)"];
 save["hodge_harmonic", hg];
 
-(* ---- 6. the 3D scan: Yoda ---------------------------------------------- *)
-yoda = Import[FileNameJoin[{ParentDirectory[DirectoryName[$InputFileName]], "data", "yoda.obj"}], "MeshRegion"];
-yp = DDG`meshCoords[yoda]; yt = DDG`meshTriangles[yoda];
-yview = {ViewPoint -> {0.45, -0.4, 2.3}, ViewVertical -> {0, 1, 0}};
-ysrc = First@Ordering[yp[[All, 2]], -1];
-save["yoda_geo", surf[yp, yt, banded[DDG`heatGeodesics[yoda, ysrc], 22],
-   Sequence @@ yview, PlotLabel -> "geodesic distance from the head"]];
-yh = DDG`meanCurvature[yoda]; yh = Sign[Median[yh]] yh;
+(* ---- 6. the 3D scan: T. rex skull -------------------------------------- *)
+trex = Import[FileNameJoin[{ParentDirectory[DirectoryName[$InputFileName]], "data", "trex.obj"}], "MeshRegion"];
+yp = DDG`meshCoords[trex]; yt = DDG`meshTriangles[trex];
+yview = {ViewPoint -> {0.55, -2.25, 0.05}, ViewVertical -> {1, 0, 0}};
+zc = yp[[All, 3]]; {zlo, zhi} = MinMax[zc]; zlen = zhi - zlo;
+spread[e_] := Module[{xy = Select[yp, Abs[#[[3]] - e] < 0.12 zlen &][[All, {1, 2}]]},
+   RootMeanSquare[Flatten[(# - Mean[xy]) & /@ xy]]];
+ysrc = First@Ordering[Abs[zc - If[spread[zlo] < spread[zhi], zlo, zhi]], 1];
+save["trex_geo", surf[yp, yt, banded[DDG`heatGeodesics[trex, ysrc], 22],
+   Sequence @@ yview, PlotLabel -> "geodesic distance from the snout"]];
+yh = DDG`meanCurvature[trex]; yh = Sign[Median[yh]] yh;
 {ylo, yhi} = Quantile[yh, {0.03, 0.97}];
-save["yoda_H", surf[yp, yt,
+save["trex_H", surf[yp, yt,
    Map[ColorData["ThermometerColors"], Rescale[Clip[yh, {ylo, yhi}], {ylo, yhi}]],
    Sequence @@ yview, PlotLabel -> "mean curvature on the scan"]];
 
