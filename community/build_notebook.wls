@@ -19,6 +19,18 @@ modelDir = FileNameJoin[{repoRoot, "docs", "models"}];
 codeDir  = FileNameJoin[{repoRoot, "community", "code"}];
 outNb    = FileNameJoin[{repoRoot, "community", "ddg.nb"}];
 outPdf   = FileNameJoin[{repoRoot, "community", "ddg.pdf"}];
+commDir  = FileNameJoin[{repoRoot, "community"}];
+
+(* Place the two packages next to the notebook so the initialization cell can
+   load them from NotebookDirectory[] -- both in this repo and in the uploaded
+   bundle (ddg.nb + ddg.wl + graphgeometry.wl in one folder). Canonical source
+   stays wolfram/*.wl; these are build-generated copies, kept in sync here. *)
+Do[With[{src = FileNameJoin[{repoRoot, "wolfram", p}],
+         dst = FileNameJoin[{commDir, p}]},
+    If[FileExistsQ[dst], DeleteFile[dst]];
+    CopyFile[src, dst];
+    Print["copied ", p, " -> community/"]],
+  {p, {"ddg.wl", "graphgeometry.wl"}}];
 
 (* ---- cell helpers ------------------------------------------------------ *)
 title[t_]    := Cell[t, "Title"];
@@ -170,15 +182,19 @@ the ", bold["Wolfram Physics Project"], "."}],
 (* ====================== Setup =================================== *)
 hd1["Setup: the two accompanying packages"],
 para[{"Every operator used below lives in one of two small, plain-text Wolfram \
-packages committed alongside this notebook: ", mono["wolfram/ddg.wl"],
+packages that travel with this notebook: ", mono["ddg.wl"],
   " (mesh operators \[LongDash] curvature, the cotangent Laplacian, spectra, \
-mean-curvature flow, heat-method geodesics, DEC) and ", mono["wolfram/graphgeometry.wl"],
-  " (graph curvature and emergent dimension). Load them once at the top; \
-thereafter ", bold["every figure is preceded by the exact code \[LongDash] with \
-all arguments \[LongDash] that produced it"], ". The displayed figures are the \
-committed high-resolution renders, so reading the notebook needs no evaluation; \
-re-running the code cells regenerates them."}],
-shown["setup"],
+mean-curvature flow, heat-method geodesics, DEC) and ", mono["graphgeometry.wl"],
+  " (graph curvature and emergent dimension). Keep all three files in the same \
+folder; the ", bold["initialization cell"], " below loads the packages \
+automatically from ", mono["NotebookDirectory[]"], " when you evaluate the \
+notebook. Thereafter ", bold["every figure is preceded by the exact code \
+\[LongDash] with all arguments \[LongDash] that produced it"], ". The displayed \
+figures are the committed high-resolution renders, so reading the notebook needs \
+no evaluation; re-running the code cells regenerates them."}],
+With[{setupSrc = StringTrim[Import[FileNameJoin[{codeDir, "setup.wl"}], "Text"]]},
+  Cell[setupSrc, "Input", InitializationCell -> True,
+    CellMargins -> {{60, 30}, {6, 6}}, FontSize -> 11]],
 
 (* ====================== 0. Discrete world ======================== *)
 hd1["0.  The discrete world: meshes and a dictionary"],
